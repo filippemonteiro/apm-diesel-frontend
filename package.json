@@ -1,16 +1,16 @@
 {
-  "name": "aupm-diesel-frontend",
+  "name": "apm-diesel-frontend",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Sistema de controle de frota - AuPM Diesel",
+  "description": "Sistema de controle de frota - APM Diesel",
   "keywords": [
     "react",
     "vite",
     "bootstrap",
     "fleet-management"
   ],
-  "author": "AuPM Diesel",
+  "author": "APM Diesel",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

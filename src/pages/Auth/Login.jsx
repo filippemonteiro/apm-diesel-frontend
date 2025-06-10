@@ -8,6 +8,7 @@ import {
   FaEnvelope,
   FaLock,
   FaSignInAlt,
+  FaUser,
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 
@@ -120,38 +121,70 @@ function Login() {
 
   return (
     <div className="fade-in">
-      {/* Logo e Nome Principal */}
-      <div className="text-center mb-5">
+      {/* Logo e Nome Principal - Compacto */}
+      <div className="text-center mb-4">
         <div className="d-flex align-items-center justify-content-center mb-3">
-          <img 
-            src="/img/logo.svg" 
-            alt="APM Diesel Logo" 
-            style={{ 
-              width: '80px', 
-              height: '80px',
-              objectFit: 'cover',
-              borderRadius: '12px',
-              marginRight: '20px',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+          <img
+            src="/img/logo.svg"
+            alt="APM Diesel Logo"
+            style={{
+              width: "56px",
+              height: "56px",
+              objectFit: "cover",
+              borderRadius: "12px",
+              marginRight: "14px",
+              boxShadow: "0 4px 16px rgba(26, 31, 58, 0.15)",
+              transition: "transform 0.3s ease",
             }}
             onError={(e) => {
               e.target.src = "/img/logo.png";
             }}
+            onMouseEnter={(e) => (e.target.style.transform = "scale(1.05)")}
+            onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
           />
           <div className="text-start">
-            <h2 className="text-primary-apm fw-bold mb-1" style={{ fontSize: '2rem' }}>
+            <h1
+              className="text-primary-apm fw-bold mb-0"
+              style={{
+                fontSize: "1.75rem",
+                letterSpacing: "-0.3px",
+                lineHeight: 1.1,
+              }}
+            >
               APM Diesel
-            </h2>
-            <p className="text-muted mb-0" style={{ fontSize: '1rem' }}>
+            </h1>
+            <p
+              className="text-muted mb-0"
+              style={{
+                fontSize: "0.95rem",
+                fontWeight: "500",
+                color: "var(--primary-gold)",
+              }}
+            >
               Peças e Serviços
             </p>
           </div>
         </div>
-        <div className="text-center">
-          <small className="text-muted" style={{ fontSize: '0.9rem' }}>
-            Sistema de Controle de Frota
-          </small>
-        </div>
+        <div
+          className="mx-auto"
+          style={{
+            width: "40px",
+            height: "2px",
+            background:
+              "linear-gradient(90deg, var(--primary-dark) 0%, var(--primary-gold) 100%)",
+            borderRadius: "1px",
+            marginBottom: "0.5rem",
+          }}
+        ></div>
+        <p
+          className="text-muted mb-0"
+          style={{
+            fontSize: "0.85rem",
+            fontWeight: "400",
+          }}
+        >
+          Sistema de Controle de Frota
+        </p>
       </div>
 
       {/* Alertas de erro global */}
@@ -161,12 +194,15 @@ function Login() {
         </Alert>
       )}
 
-      {/* Formulário */}
+      {/* Formulário Compacto */}
       <Form onSubmit={handleSubmit}>
         {/* Email */}
         <Form.Group className="mb-3">
-          <Form.Label className="fw-semibold">
-            <FaEnvelope className="me-2" />
+          <Form.Label
+            className="fw-semibold text-dark mb-2"
+            style={{ fontSize: "0.9rem" }}
+          >
+            <FaEnvelope className="me-2 text-primary-apm" size={14} />
             Email
           </Form.Label>
           <Form.Control
@@ -174,20 +210,30 @@ function Login() {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            placeholder="seu@email.com"
+            placeholder="Digite seu email"
             isInvalid={!!errors.email}
             disabled={isSubmitting || isLoading}
             autoComplete="email"
+            style={{
+              fontSize: "0.95rem",
+              padding: "12px 14px",
+              border: "2px solid var(--border-light)",
+              borderRadius: "10px",
+              transition: "all 0.3s ease",
+            }}
           />
-          <Form.Control.Feedback type="invalid">
+          <Form.Control.Feedback type="invalid" style={{ fontSize: "0.8rem" }}>
             {errors.email}
           </Form.Control.Feedback>
         </Form.Group>
 
         {/* Senha */}
         <Form.Group className="mb-3">
-          <Form.Label className="fw-semibold">
-            <FaLock className="me-2" />
+          <Form.Label
+            className="fw-semibold text-dark mb-2"
+            style={{ fontSize: "0.9rem" }}
+          >
+            <FaLock className="me-2 text-primary-apm" size={14} />
             Senha
           </Form.Label>
           <div className="position-relative">
@@ -200,19 +246,30 @@ function Login() {
               isInvalid={!!errors.password}
               disabled={isSubmitting || isLoading}
               autoComplete="current-password"
+              style={{
+                fontSize: "0.95rem",
+                padding: "12px 45px 12px 14px",
+                border: "2px solid var(--border-light)",
+                borderRadius: "10px",
+                transition: "all 0.3s ease",
+              }}
             />
             <Button
               variant="link"
-              className="position-absolute end-0 top-50 translate-middle-y border-0 text-muted"
-              style={{ zIndex: 10 }}
+              className="position-absolute end-0 top-50 translate-middle-y border-0"
+              style={{
+                zIndex: 10,
+                padding: "6px 10px",
+                color: "var(--text-muted)",
+              }}
               onClick={() => setShowPassword(!showPassword)}
               disabled={isSubmitting || isLoading}
               aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
+              {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
             </Button>
           </div>
-          <Form.Control.Feedback type="invalid">
+          <Form.Control.Feedback type="invalid" style={{ fontSize: "0.8rem" }}>
             {errors.password}
           </Form.Control.Feedback>
         </Form.Group>
@@ -221,19 +278,32 @@ function Login() {
         <div className="d-flex justify-content-end mb-3">
           <Link
             to="/reset-password"
-            className="text-decoration-none small text-primary-apm"
+            className="text-decoration-none text-primary-apm"
+            style={{
+              fontSize: "0.85rem",
+              fontWeight: "500",
+              transition: "color 0.3s ease",
+            }}
           >
             Esqueceu sua senha?
           </Link>
         </div>
 
-        {/* Botão de submit */}
+        {/* Botão de submit compacto */}
         <Button
           type="submit"
           variant="primary"
           size="lg"
           className="w-100 mb-3"
           disabled={isSubmitting || isLoading}
+          style={{
+            padding: "14px",
+            fontSize: "1rem",
+            fontWeight: "600",
+            borderRadius: "10px",
+            boxShadow: "0 3px 12px rgba(26, 31, 58, 0.2)",
+            transition: "all 0.3s ease",
+          }}
         >
           {isSubmitting || isLoading ? (
             <>
@@ -247,48 +317,79 @@ function Login() {
               Entrando...
             </>
           ) : (
-            <>
-              <FaSignInAlt className="me-2" />
-              Entrar
-            </>
+            "Entrar no Sistema"
           )}
         </Button>
 
-        {/* Divisor */}
-        <hr className="my-4" />
-
-        {/* Botões de demonstração */}
-        <div className="text-center mb-3">
-          <small className="text-muted d-block mb-3" style={{ fontSize: '0.85rem' }}>
-            Contas de demonstração:
-          </small>
-          <div className="d-grid gap-2">
-            <Button
-              variant="outline-primary"
-              onClick={() => handleDemoLogin("admin")}
-              disabled={isSubmitting || isLoading}
-            >
-              Entrar como Administrador
-            </Button>
-            <Button
-              variant="outline-secondary"
-              onClick={() => handleDemoLogin("driver")}
-              disabled={isSubmitting || isLoading}
-            >
-              Entrar como Motorista
-            </Button>
+        {/* Divisor compacto */}
+        <div className="position-relative my-3">
+          <hr
+            style={{
+              margin: 0,
+              border: "none",
+              height: "1px",
+              background: "var(--border-light)",
+            }}
+          />
+          <div
+            className="position-absolute top-50 start-50 translate-middle px-2"
+            style={{ backgroundColor: "white" }}
+          >
+            <small className="text-muted" style={{ fontSize: "0.8rem" }}>
+              contas demo
+            </small>
           </div>
         </div>
 
-        {/* Link para cadastro */}
-        <div className="text-center">
-          <p className="mb-0">
-            Não tem uma conta?{" "}
+        {/* Botões de demonstração compactos */}
+        <div className="d-grid gap-2 mb-3">
+          <Button
+            variant="outline-primary"
+            onClick={() => handleDemoLogin("admin")}
+            disabled={isSubmitting || isLoading}
+            style={{
+              padding: "10px 14px",
+              fontSize: "0.9rem",
+              fontWeight: "500",
+              borderRadius: "10px",
+              transition: "all 0.3s ease",
+            }}
+          >
+            <FaUser className="me-2" size={14} />
+            Admin
+          </Button>
+          <Button
+            variant="outline-secondary"
+            onClick={() => handleDemoLogin("driver")}
+            disabled={isSubmitting || isLoading}
+            style={{
+              padding: "10px 14px",
+              fontSize: "0.9rem",
+              fontWeight: "500",
+              borderRadius: "10px",
+              transition: "all 0.3s ease",
+            }}
+          >
+            <FaUser className="me-2" size={14} />
+            Motorista
+          </Button>
+        </div>
+
+        {/* Link para cadastro compacto */}
+        <div
+          className="text-center pt-2"
+          style={{ borderTop: "1px solid var(--border-light)" }}
+        >
+          <p className="mb-0" style={{ fontSize: "0.9rem" }}>
+            Não possui conta?{" "}
             <Link
               to="/signup"
               className="text-decoration-none text-primary-apm fw-semibold"
+              style={{
+                transition: "color 0.3s ease",
+              }}
             >
-              Cadastre-se
+              Criar conta
             </Link>
           </p>
         </div>
