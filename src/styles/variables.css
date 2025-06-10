@@ -1,0 +1,45 @@
+/* Variáveis CSS baseadas na identidade visual da APM Diesel */
+:root {
+  /* Cores principais da marca */
+  --primary-dark: #1a1f3a; /* Azul escuro da logo */
+  --primary-gold: #d4af37; /* Dourado da logo */
+  --primary-white: #ffffff; /* Branco */
+
+  /* Cores secundárias */
+  --secondary-gray: #f8f9fa; /* Cinza claro para fundos */
+  --secondary-dark: #343a40; /* Cinza escuro */
+
+  /* Cores de texto */
+  --text-dark: #2c3e50; /* Texto escuro */
+  --text-light: #6c757d; /* Texto secundário */
+  --text-muted: #868e96; /* Texto esmaecido */
+
+  /* Cores de feedback */
+  --success: #28a745; /* Verde para sucesso */
+  --warning: #ffc107; /* Amarelo para avisos */
+  --danger: #dc3545; /* Vermelho para erros */
+  --info: #17a2b8; /* Azul para informações */
+
+  /* Cores de borda e fundo */
+  --border-light: #dee2e6; /* Bordas claras */
+  --border-dark: #495057; /* Bordas escuras */
+  --bg-light: #f8f9fa; /* Fundo claro */
+  --bg-white: #ffffff; /* Fundo branco */
+
+  /* Sombras */
+  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+
+  /* Bordas arredondadas */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 1rem;
+
+  /* Espaçamentos */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 3rem;
+}
