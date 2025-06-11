@@ -1,10 +1,15 @@
 import React from "react";
 import { Container, Card, Alert, Table } from "react-bootstrap";
 import { FaHistory, FaCar, FaTools } from "react-icons/fa";
+import BackButton from "../../components/common/BackButton";
 
 function ServiceHistory() {
   return (
     <Container>
+      <div className="mb-3">
+        <BackButton />
+      </div>
+      
       <div className="text-center mb-4">
         <h2 className="text-primary-apm">
           <FaHistory className="me-2" />

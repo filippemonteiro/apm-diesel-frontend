@@ -1,10 +1,15 @@
 import React from "react";
 import { Container, Card, Button, Alert } from "react-bootstrap";
 import { FaTools, FaGasPump, FaWrench } from "react-icons/fa";
+import BackButton from "../../components/common/BackButton";
 
 function ServiceRequest() {
   return (
     <Container>
+      <div className="mb-3">
+        <BackButton />
+      </div>
+      
       <div className="text-center mb-4">
         <h2 className="text-primary-apm">
           <FaTools className="me-2" />
