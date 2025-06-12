@@ -93,14 +93,22 @@ class AuthService {
   // Realizar login
   async login(credentials) {
     try {
+      console.log("🔐 AuthService.login iniciado com:", {
+        email: credentials.email,
+      });
+
       // Validar dados
       const validation = this.validateLoginData(credentials);
       if (!validation.isValid) {
-        throw new Error(Object.values(validation.errors)[0]);
+        const errorMessage = Object.values(validation.errors)[0];
+        console.log("❌ Validação falhou:", errorMessage);
+        throw new Error(errorMessage);
       }
 
       // Fazer login via API
+      console.log("📡 Chamando ApiService.login...");
       const response = await ApiService.login(credentials);
+      console.log("✅ ApiService.login resposta:", response);
 
       return {
         success: true,
@@ -109,6 +117,7 @@ class AuthService {
         message: response.message,
       };
     } catch (error) {
+      console.error("❌ AuthService.login erro:", error);
       return {
         success: false,
         message: error.message,
@@ -119,6 +128,8 @@ class AuthService {
   // Realizar registro
   async register(userData) {
     try {
+      console.log("📝 AuthService.register iniciado");
+
       // Validar dados
       const validation = this.validateRegisterData(userData);
       if (!validation.isValid) {
@@ -134,6 +145,7 @@ class AuthService {
         message: response.message,
       };
     } catch (error) {
+      console.error("❌ AuthService.register erro:", error);
       return {
         success: false,
         message: error.message,
@@ -168,7 +180,9 @@ class AuthService {
   // Realizar logout
   async logout() {
     try {
+      console.log("🚪 AuthService.logout iniciado");
       const response = await ApiService.logout();
+      console.log("✅ Logout realizado");
 
       return {
         success: true,
@@ -176,6 +190,7 @@ class AuthService {
       };
     } catch (error) {
       // Mesmo com erro, limpa dados locais
+      console.log("⚠️ Erro no logout, limpando dados locais");
       LocalStorageService.clearAuthData();
       return {
         success: true,
@@ -189,6 +204,12 @@ class AuthService {
     const user = LocalStorageService.getCurrentUser();
     const token = LocalStorageService.getAuthToken();
 
+    console.log("🔍 AuthService.isAuthenticated:", {
+      hasUser: !!user,
+      hasToken: !!token,
+      userName: user?.name,
+    });
+
     if (!user || !token) {
       return false;
     }
@@ -196,25 +217,42 @@ class AuthService {
     // Verificar se token não expirou (simulação)
     try {
       const tokenData = JSON.parse(atob(token));
-      if (Date.now() > tokenData.exp) {
+      const isTokenValid = Date.now() < tokenData.exp;
+
+      console.log("🔑 Token check:", {
+        isValid: isTokenValid,
+        expires: new Date(tokenData.exp).toLocaleString(),
+      });
+
+      if (!isTokenValid) {
+        console.log("⏰ Token expirado, fazendo logout automático");
         this.logout();
         return false;
       }
       return true;
     } catch (error) {
+      console.error("❌ Erro ao verificar token:", error);
       return false;
     }
   }
 
   // Obter usuário atual
   getCurrentUser() {
-    return LocalStorageService.getCurrentUser();
+    const user = LocalStorageService.getCurrentUser();
+    console.log("👤 AuthService.getCurrentUser:", user?.name || "null");
+    return user;
   }
 
   // Verificar se usuário tem determinada role
   hasRole(role) {
     const user = this.getCurrentUser();
-    return user && user.role === role;
+    const hasRole = user && user.role === role;
+    console.log("🎭 AuthService.hasRole:", {
+      role,
+      hasRole,
+      userRole: user?.role,
+    });
+    return hasRole;
   }
 
   // Verificar se é admin
@@ -238,6 +276,7 @@ class AuthService {
     if (currentUser) {
       const updatedUser = { ...currentUser, ...userData };
       LocalStorageService.setCurrentUser(updatedUser);
+      console.log("📝 Usuario atualizado:", updatedUser.name);
       return updatedUser;
     }
     return null;

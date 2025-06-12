@@ -47,8 +47,8 @@ export const formatPercentage = (value) => {
 // Validar QR Code
 export const isValidQRCode = (qrCode) => {
   if (!qrCode) return false;
-  // Verifica se começa com AUPM_VEHICLE_
-  return qrCode.startsWith("AUPM_VEHICLE_");
+  // Verifica se começa com APM_VEHICLE_
+  return qrCode.startsWith("APM_VEHICLE_");
 };
 
 // Obter cor do status

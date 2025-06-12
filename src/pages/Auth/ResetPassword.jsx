@@ -168,7 +168,7 @@ function ResetPassword() {
     <div className="fade-in">
       {/* Título */}
       <div className="text-center mb-4">
-        <h4 className="text-primary-aupm fw-bold mb-2">
+        <h4 className="text-primary-apm fw-bold mb-2">
           <FaEnvelope className="me-2" />
           Recuperar Senha
         </h4>
@@ -258,7 +258,7 @@ function ResetPassword() {
           <br />
           Entre em contato com o suporte em:
           <br />
-          <a href="mailto:suporte@apmdiesel.com" className="text-primary-aupm">
+          <a href="mailto:suporte@apmdiesel.com" className="text-primary-apm">
             suporte@apmdiesel.com
           </a>
         </small>

@@ -1,18 +1,18 @@
-// Constantes da aplicação AuPM Diesel
+// Constantes da aplicação APM Diesel
 export const APP_CONFIG = {
-  name: "AuPM Diesel",
+  name: "APM Diesel",
   version: "1.0.0",
   description: "Sistema de Controle de Frota",
 };
 
 // Chaves do localStorage
 export const STORAGE_KEYS = {
-  user: "aupm_user",
-  token: "aupm_token",
-  vehicles: "aupm_vehicles",
-  vehicleHistory: "aupm_vehicle_history",
-  serviceRequests: "aupm_service_requests",
-  users: "aupm_users",
+  user: "apm_user",
+  token: "apm_token",
+  vehicles: "apm_vehicles",
+  vehicleHistory: "apm_vehicle_history",
+  serviceRequests: "apm_service_requests",
+  users: "apm_users",
 };
 
 // Status dos veículos
