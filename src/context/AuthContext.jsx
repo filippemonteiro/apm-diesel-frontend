@@ -7,7 +7,7 @@ import { USER_ROLES } from "../utils/constants";
 const initialState = {
   user: null,
   isAuthenticated: false,
-  isLoading: true,
+  isLoading: true, // Importante: inicia como true
   error: null,
 };
 
@@ -21,6 +21,7 @@ const AUTH_ACTIONS = {
   SET_ERROR: "SET_ERROR",
   CLEAR_ERROR: "CLEAR_ERROR",
   UPDATE_USER: "UPDATE_USER",
+  INIT_SUCCESS: "INIT_SUCCESS", // Nova action para inicialização
 };
 
 // Reducer
@@ -85,6 +86,15 @@ function authReducer(state, action) {
         user: action.payload.user,
       };
 
+    case AUTH_ACTIONS.INIT_SUCCESS:
+      return {
+        ...state,
+        user: action.payload.user,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      };
+
     default:
       return state;
   }
@@ -104,17 +114,46 @@ export function AuthProvider({ children }) {
         // Inicializar dados padrão se necessário
         LocalStorageService.initializeDefaultData();
 
-        const isAuth = AuthService.isAuthenticated();
-        if (isAuth) {
-          const user = AuthService.getCurrentUser();
-          dispatch({
-            type: AUTH_ACTIONS.LOGIN_SUCCESS,
-            payload: { user },
-          });
+        // Verificar se existe usuário e token no localStorage
+        const user = LocalStorageService.getCurrentUser();
+        const token = LocalStorageService.getAuthToken();
+
+        console.log('🔍 Verificando autenticação:', { user: !!user, token: !!token });
+
+        if (user && token) {
+          // Verificar se o token não expirou
+          try {
+            const tokenData = JSON.parse(atob(token));
+            const isTokenValid = Date.now() < tokenData.exp;
+            
+            console.log('🔑 Token válido:', isTokenValid);
+
+            if (isTokenValid) {
+              // Token válido, usuário autenticado
+              dispatch({
+                type: AUTH_ACTIONS.INIT_SUCCESS,
+                payload: { user },
+              });
+              console.log('✅ Usuário autenticado automaticamente:', user.name);
+            } else {
+              // Token expirado, limpar dados
+              console.log('❌ Token expirado, fazendo logout');
+              LocalStorageService.clearAuthData();
+              dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+            }
+          } catch (tokenError) {
+            // Token inválido, limpar dados
+            console.log('❌ Token inválido:', tokenError);
+            LocalStorageService.clearAuthData();
+            dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+          }
         } else {
+          // Sem usuário ou token, não autenticado
+          console.log('❌ Nenhum usuário ou token encontrado');
           dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
         }
       } catch (error) {
+        console.error('❌ Erro ao verificar autenticação:', error);
         dispatch({
           type: AUTH_ACTIONS.LOGIN_FAILURE,
           payload: { error: error.message },
@@ -123,7 +162,7 @@ export function AuthProvider({ children }) {
     };
 
     checkAuth();
-  }, []);
+  }, []); // Dependência vazia é correta aqui
 
   // Função de login
   const login = async (credentials) => {
@@ -137,6 +176,7 @@ export function AuthProvider({ children }) {
           type: AUTH_ACTIONS.LOGIN_SUCCESS,
           payload: { user: result.user },
         });
+        console.log('✅ Login realizado:', result.user.name);
         return { success: true, message: result.message };
       } else {
         dispatch({
@@ -203,10 +243,12 @@ export function AuthProvider({ children }) {
     try {
       await AuthService.logout();
       dispatch({ type: AUTH_ACTIONS.LOGOUT });
+      console.log('✅ Logout realizado');
       return { success: true };
     } catch (error) {
       // Mesmo com erro, faz logout local
       dispatch({ type: AUTH_ACTIONS.LOGOUT });
+      console.log('✅ Logout local realizado');
       return { success: true };
     }
   };
