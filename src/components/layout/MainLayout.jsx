@@ -28,7 +28,7 @@ function MainLayout({ children }) {
   const menuItems = [
     {
       path: "/dashboard",
-      label: "Dashboard",
+      label: "Painel",
       icon: <FaTachometerAlt className="me-2" />,
     },
     {
