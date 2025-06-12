@@ -349,7 +349,7 @@ function MainLayout({ children }) {
             </a>
           </div>
           <small style={{ fontSize: "0.8rem" }}>
-            © 2024 APM Diesel - Peças e Serviços |
+            APM Diesel - Peças e Serviços |
             <span className="text-gold-apm"> v1.0.0</span>
           </small>
         </Container>
