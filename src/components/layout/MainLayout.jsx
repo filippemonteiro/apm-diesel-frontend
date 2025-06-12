@@ -94,9 +94,18 @@ function MainLayout({ children }) {
                   marginRight: "10px",
                   borderRadius: "6px",
                   objectFit: "cover",
+                  transition: "all 0.3s ease",
                 }}
                 onError={(e) => {
                   e.target.src = "/img/logo.png";
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = "scale(1.05)";
+                  e.target.style.boxShadow = "0 6px 20px rgba(26, 31, 58, 0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = "scale(1)";
+                  e.target.style.boxShadow = "0 4px 16px rgba(26, 31, 58, 0.2)";
                 }}
               />
               <div>
@@ -213,9 +222,18 @@ function MainLayout({ children }) {
                 height: "24px",
                 marginRight: "8px",
                 borderRadius: "4px",
+                transition: "all 0.3s ease",
               }}
               onError={(e) => {
                 e.target.src = "/img/logo.png";
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = "scale(1.05)";
+                e.target.style.boxShadow = "0 6px 20px rgba(26, 31, 58, 0.3)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = "scale(1)";
+                e.target.style.boxShadow = "0 4px 16px rgba(26, 31, 58, 0.2)";
               }}
             />
             <div>

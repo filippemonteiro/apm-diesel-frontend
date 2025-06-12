@@ -82,7 +82,7 @@ function Login() {
 
       if (result.success) {
         toast.success(result.message);
-        navigate("/dashboard");
+        navigate("/painel");
       } else {
         toast.error(result.message);
       }
@@ -110,7 +110,7 @@ function Login() {
         toast.success(
           `Login como ${userType === "admin" ? "Administrador" : "Motorista"}`
         );
-        navigate("/dashboard");
+        navigate("/painel");
       }
     } catch (err) {
       toast.error("Erro no login de demonstração");
@@ -128,21 +128,27 @@ function Login() {
             src="/img/logo.svg"
             alt="APM Diesel Logo"
             style={{
-              width: "56px",
-              height: "56px",
+              width: "80px",
+              height: "80px",
               objectFit: "cover",
-              borderRadius: "12px",
-              marginRight: "14px",
-              boxShadow: "0 4px 16px rgba(26, 31, 58, 0.15)",
-              transition: "transform 0.3s ease",
+              borderRadius: "16px",
+              boxShadow: "0 8px 24px rgba(26, 31, 58, 0.25)",
+              transition: "all 0.3s ease",
+              cursor: "pointer",
             }}
             onError={(e) => {
               e.target.src = "/img/logo.png";
             }}
-            onMouseEnter={(e) => (e.target.style.transform = "scale(1.05)")}
-            onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
+            onMouseEnter={(e) => {
+              e.target.style.transform = "scale(1.05)";
+              e.target.style.boxShadow = "0 12px 32px rgba(26, 31, 58, 0.35)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = "scale(1)";
+              e.target.style.boxShadow = "0 8px 24px rgba(26, 31, 58, 0.25)";
+            }}
           />
-          <div className="text-start">
+          <div className="text-start ms-3">
             <h1
               className="text-primary-apm fw-bold mb-0"
               style={{
@@ -154,7 +160,7 @@ function Login() {
               APM Diesel
             </h1>
             <p
-              className="text-muted mb-0"
+              className="mb-0"
               style={{
                 fontSize: "0.95rem",
                 fontWeight: "500",
