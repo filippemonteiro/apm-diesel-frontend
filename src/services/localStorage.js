@@ -292,6 +292,7 @@ class LocalStorageService {
 
   // Métodos de autenticação
   setCurrentUser(user) {
+    console.log("💾 LocalStorage.setCurrentUser:", user.name);
     this.setItem(STORAGE_KEYS.user, user);
   }
 
@@ -301,27 +302,21 @@ class LocalStorageService {
     return user;
   }
 
+  setAuthToken(token) {
+    console.log("💾 LocalStorage.setAuthToken:", !!token);
+    this.setItem(STORAGE_KEYS.token, token);
+  }
+
   getAuthToken() {
     const token = this.getItem(STORAGE_KEYS.token);
     console.log("🔑 LocalStorage.getAuthToken:", !!token);
     return token;
   }
 
-  setCurrentUser(user) {
-    console.log("💾 LocalStorage.setCurrentUser:", user.name);
-    this.setItem(STORAGE_KEYS.user, user);
-  }
-
-  setAuthToken(token) {
-    console.log("💾 LocalStorage.setAuthToken:", !!token);
-    this.setItem(STORAGE_KEYS.token, token);
-  }
-
   clearAuthData() {
     this.removeItem(STORAGE_KEYS.user);
     this.removeItem(STORAGE_KEYS.token);
   }
-
   // Método para limpar todos os dados (reset da aplicação)
   clearAllData() {
     Object.values(STORAGE_KEYS).forEach((key) => {

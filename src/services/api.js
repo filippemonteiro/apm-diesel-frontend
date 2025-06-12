@@ -179,13 +179,15 @@ class ApiService {
     } catch (error) {
       console.log("⚠️ Erro no logout do backend, continuando...");
       // Continua mesmo se der erro na API
-    } finally {
-      LocalStorageService.clearAuthData();
-      console.log("✅ Dados locais limpos");
-      return {
-        message: MESSAGES.success.logout,
-      };
     }
+
+    // Sempre limpa os dados locais (movido para fora do finally)
+    LocalStorageService.clearAuthData();
+    console.log("✅ Dados locais limpos");
+
+    return {
+      message: "Logout realizado com sucesso!",
+    };
   }
 
   // VEÍCULOS
