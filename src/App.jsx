@@ -1,11 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-
-// Context
 import { AuthProvider } from "./context/AuthContext";
-
-// Rotas
 import AppRoutes from "./routes";
 
 // Estilos

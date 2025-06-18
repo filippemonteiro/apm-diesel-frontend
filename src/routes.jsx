@@ -46,7 +46,7 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-// Componente de rota pública (só acessa se não estiver logado)
+// Componente de rota pública
 function PublicRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
 
