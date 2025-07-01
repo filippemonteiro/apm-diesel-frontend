@@ -2,14 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  FaEye,
-  FaEyeSlash,
-  FaEnvelope,
-  FaLock,
-  FaSignInAlt,
-  FaUser,
-} from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 
 function Login() {
@@ -27,7 +20,7 @@ function Login() {
   // Limpar erros quando o componente monta
   useEffect(() => {
     clearError();
-  }, []); // Array de dependências vazio para executar apenas uma vez
+  }, []); // Array vazio - executa apenas na montagem
 
   // Manipular mudanças nos inputs
   const handleChange = (e) => {
@@ -93,35 +86,9 @@ function Login() {
     }
   };
 
-  // Login com dados de demonstração
-  const handleDemoLogin = async (userType) => {
-    const demoCredentials = {
-      admin: { email: "admin@apmdiesel.com", password: "123456" },
-      driver: { email: "motorista@apmdiesel.com", password: "123456" },
-    };
-
-    const credentials = demoCredentials[userType];
-    setFormData(credentials);
-
-    setIsSubmitting(true);
-    try {
-      const result = await login(credentials);
-      if (result.success) {
-        toast.success(
-          `Login como ${userType === "admin" ? "Administrador" : "Motorista"}`
-        );
-        navigate("/painel");
-      }
-    } catch (err) {
-      toast.error("Erro no login de demonstração");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <div className="fade-in">
-      {/* Logo e Nome Principal - Compacto */}
+      {/* Logo e Nome Principal */}
       <div className="text-center mb-4">
         <div className="d-flex align-items-center justify-content-center mb-3">
           <img
@@ -200,7 +167,7 @@ function Login() {
         </Alert>
       )}
 
-      {/* Formulário Compacto */}
+      {/* Formulário */}
       <Form onSubmit={handleSubmit}>
         {/* Email */}
         <Form.Group className="mb-3">
@@ -295,7 +262,7 @@ function Login() {
           </Link>
         </div>
 
-        {/* Botão de submit compacto */}
+        {/* Botão de submit */}
         <Button
           type="submit"
           variant="primary"
@@ -327,61 +294,7 @@ function Login() {
           )}
         </Button>
 
-        {/* Divisor compacto */}
-        <div className="position-relative my-3">
-          <hr
-            style={{
-              margin: 0,
-              border: "none",
-              height: "1px",
-              background: "var(--border-light)",
-            }}
-          />
-          <div
-            className="position-absolute top-50 start-50 translate-middle px-2"
-            style={{ backgroundColor: "white" }}
-          >
-            <small className="text-muted" style={{ fontSize: "0.8rem" }}>
-              contas demo
-            </small>
-          </div>
-        </div>
-
-        {/* Botões de demonstração compactos */}
-        <div className="d-grid gap-2 mb-3">
-          <Button
-            variant="outline-primary"
-            onClick={() => handleDemoLogin("admin")}
-            disabled={isSubmitting || isLoading}
-            style={{
-              padding: "10px 14px",
-              fontSize: "0.9rem",
-              fontWeight: "500",
-              borderRadius: "10px",
-              transition: "all 0.3s ease",
-            }}
-          >
-            <FaUser className="me-2" size={14} />
-            Admin
-          </Button>
-          <Button
-            variant="outline-secondary"
-            onClick={() => handleDemoLogin("driver")}
-            disabled={isSubmitting || isLoading}
-            style={{
-              padding: "10px 14px",
-              fontSize: "0.9rem",
-              fontWeight: "500",
-              borderRadius: "10px",
-              transition: "all 0.3s ease",
-            }}
-          >
-            <FaUser className="me-2" size={14} />
-            Motorista
-          </Button>
-        </div>
-
-        {/* Link para cadastro compacto */}
+        {/* Link para cadastro */}
         <div
           className="text-center pt-2"
           style={{ borderTop: "1px solid var(--border-light)" }}

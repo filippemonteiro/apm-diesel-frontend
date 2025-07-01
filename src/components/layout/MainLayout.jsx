@@ -27,7 +27,7 @@ function MainLayout({ children }) {
 
   const menuItems = [
     {
-      path: "/dashboard",
+      path: "/painel", // ✅ CORRIGIDO: era "/dashboard"
       label: "Painel",
       icon: <FaTachometerAlt className="me-2" />,
     },
@@ -81,7 +81,7 @@ function MainLayout({ children }) {
             </Button>
 
             <Link
-              to="/dashboard"
+              to="/painel" // ✅ CORRIGIDO: era "/dashboard"
               className="navbar-brand fw-bold d-flex align-items-center text-decoration-none"
               style={{ fontSize: "1.25rem" }}
             >

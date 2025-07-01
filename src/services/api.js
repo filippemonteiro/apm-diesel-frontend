@@ -5,7 +5,7 @@ import { MESSAGES } from "../utils/constants";
 
 // Configuração base do Axios
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000/api",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -32,8 +32,15 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    console.error(
+      "🚨 Interceptor pegou erro:",
+      error.response?.status,
+      error.response?.data
+    );
+
     // Trata erros de autenticação
     if (error.response?.status === 401) {
+      console.warn("🔑 401 Unauthorized - limpando dados e redirecionando");
       LocalStorageService.clearAuthData();
       toast.error("Sessão expirada. Faça login novamente.");
       window.location.href = "/login";
@@ -41,439 +48,202 @@ api.interceptors.response.use(
 
     // Trata outros erros HTTP
     if (error.response?.status >= 500) {
-      toast.error("Erro de conexão. Tente novamente.");
+      toast.error(MESSAGES.error.networkError);
     }
 
     return Promise.reject(error);
   }
 );
 
-// Classe principal da API com métodos simulados
+// Classe principal da API
 class ApiService {
-  // Simular delay de rede
-  async simulateDelay(ms = 500) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
   // AUTENTICAÇÃO
   async login(credentials) {
-    console.log("🔐 ApiService.login iniciado:", credentials.email);
-    await this.simulateDelay();
-
     try {
-      // Tentar requisição real
-      console.log("📡 Tentando requisição real...");
-      const response = await api.post("/auth/login", credentials);
-      console.log("✅ Resposta do backend:", response.data);
-      return response.data;
-    } catch (error) {
-      console.log("🔄 Backend não disponível - usando simulação local");
-
-      // Fallback para simulação
-      const user = LocalStorageService.getUserByEmail(credentials.email);
-
-      if (!user) {
-        console.log("❌ Usuário não encontrado:", credentials.email);
-        throw new Error(MESSAGES.error.invalidCredentials);
-      }
-
-      if (user.password !== credentials.password) {
-        console.log("❌ Senha incorreta para:", credentials.email);
-        throw new Error(MESSAGES.error.invalidCredentials);
-      }
-
-      // Criar token simulado
-      const token = btoa(
-        JSON.stringify({
-          userId: user.id,
-          exp: Date.now() + 86400000, // 24 horas
-        })
+      console.log(
+        "📡 ApiService.login - enviando para:",
+        api.defaults.baseURL + "/login"
       );
+      console.log("📡 ApiService.login - dados:", { email: credentials.email });
 
-      // Preparar dados do usuário (sem senha)
-      const userData = { ...user };
-      delete userData.password;
+      const response = await api.post("/login", credentials);
 
-      // Salvar no localStorage
-      LocalStorageService.setCurrentUser(userData);
-      LocalStorageService.setAuthToken(token);
+      console.log("✅ ApiService.login - resposta completa:", response);
+      console.log("✅ ApiService.login - response.data:", response.data);
 
-      console.log("✅ Login simulado realizado:", userData.name);
+      // Backend retorna só token, precisamos buscar dados do usuário
+      if (response.data.token) {
+        console.log("💾 Salvando token:", !!response.data.token);
+        LocalStorageService.setAuthToken(response.data.token);
 
-      return {
-        user: userData,
-        token,
-        message: MESSAGES.success.login,
-      };
+        // Buscar dados do usuário com o token
+        try {
+          console.log("👤 Buscando dados do usuário...");
+          const userResponse = await api.post("/me");
+          console.log("👤 Dados do usuário:", userResponse.data);
+
+          LocalStorageService.setCurrentUser(userResponse.data);
+
+          return {
+            user: userResponse.data,
+            token: response.data.token,
+            message: response.data.message,
+          };
+        } catch (userError) {
+          console.error("❌ Erro ao buscar usuário:", userError);
+          // Se falhar ao buscar usuário, criar um usuário básico
+          const basicUser = {
+            email: credentials.email,
+            name: credentials.email.split("@")[0],
+            role: "driver",
+          };
+          LocalStorageService.setCurrentUser(basicUser);
+
+          return {
+            user: basicUser,
+            token: response.data.token,
+            message: response.data.message,
+          };
+        }
+      } else {
+        console.warn("⚠️ Resposta sem token:", response.data);
+        throw new Error("Token não recebido do servidor");
+      }
+    } catch (error) {
+      console.error("❌ ApiService.login - erro:", error);
+      console.error("❌ Error response:", error.response?.data);
+
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error(MESSAGES.error.invalidCredentials);
     }
   }
 
   async register(userData) {
-    console.log("📝 ApiService.register iniciado");
-    await this.simulateDelay();
-
     try {
-      const response = await api.post("/auth/register", userData);
+      const response = await api.post("/cadastro", userData);
       return response.data;
     } catch (error) {
-      console.log("🔄 Backend não disponível - usando simulação para registro");
-
-      // Fallback para simulação
-      const existingUser = LocalStorageService.getUserByEmail(userData.email);
-
-      if (existingUser) {
-        console.log("❌ Email já existe:", userData.email);
-        throw new Error(MESSAGES.error.userExists);
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
       }
-
-      const newUser = LocalStorageService.createUser({
-        ...userData,
-        role: userData.role || "driver",
-      });
-
-      const userResponse = { ...newUser };
-      delete userResponse.password;
-
-      console.log("✅ Usuário criado:", userResponse.name);
-
-      return {
-        user: userResponse,
-        message: MESSAGES.success.register,
-      };
-    }
-  }
-
-  async resetPassword(email) {
-    console.log("🔑 ApiService.resetPassword iniciado:", email);
-    await this.simulateDelay();
-
-    try {
-      const response = await api.post("/auth/reset-password", { email });
-      return response.data;
-    } catch (error) {
-      console.log("🔄 Backend não disponível - usando simulação para reset");
-
-      // Fallback para simulação
-      const user = LocalStorageService.getUserByEmail(email);
-
-      if (!user) {
-        console.log("❌ Email não encontrado para reset:", email);
-        throw new Error("Email não encontrado");
-      }
-
-      console.log("✅ Reset simulado enviado para:", email);
-
-      return {
-        message: MESSAGES.success.passwordReset,
-      };
+      throw new Error("Erro ao criar conta. Tente novamente.");
     }
   }
 
   async logout() {
-    console.log("🚪 ApiService.logout iniciado");
-    await this.simulateDelay(200);
-
     try {
-      await api.post("/auth/logout");
-      console.log("✅ Logout no backend realizado");
+      await api.post("/logout");
     } catch (error) {
-      console.log("⚠️ Erro no logout do backend, continuando...");
       // Continua mesmo se der erro na API
+      console.warn("Erro no logout do backend:", error);
+    } finally {
+      // Sempre limpa os dados locais
+      LocalStorageService.clearAuthData();
     }
 
-    // Sempre limpa os dados locais (movido para fora do finally)
-    LocalStorageService.clearAuthData();
-    console.log("✅ Dados locais limpos");
-
     return {
-      message: "Logout realizado com sucesso!",
+      message: MESSAGES.success.logout,
     };
   }
 
-  // VEÍCULOS
-  async getVehicles() {
-    console.log("🚗 ApiService.getVehicles iniciado");
-    await this.simulateDelay();
-
+  async resetPassword(email) {
     try {
-      const response = await api.get("/vehicles");
+      const response = await api.post("/reset-password", { email });
       return response.data;
     } catch (error) {
-      console.log("🔄 Backend não disponível - retornando veículos locais");
-      return {
-        vehicles: LocalStorageService.getAllVehicles(),
-        simulated: true,
-      };
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error("Erro ao enviar email de recuperação.");
+    }
+  }
+
+  // USUÁRIO ATUAL
+  async getCurrentUser() {
+    try {
+      const response = await api.post("/me");
+      return response.data;
+    } catch (error) {
+      throw new Error("Erro ao obter dados do usuário.");
+    }
+  }
+
+  // VEÍCULOS (endpoints futuros)
+  async getVehicles() {
+    try {
+      const response = await api.get("/carros");
+      return response.data;
+    } catch (error) {
+      throw new Error("Erro ao buscar veículos.");
     }
   }
 
   async getVehicleById(id) {
-    console.log("🚗 ApiService.getVehicleById iniciado:", id);
-    await this.simulateDelay();
-
     try {
-      const response = await api.get(`/vehicles/${id}`);
+      const response = await api.get(`/carros/${id}`);
       return response.data;
     } catch (error) {
-      console.log("🔄 Backend não disponível - buscando veículo local");
-      const vehicle = LocalStorageService.getVehicleById(id);
-      if (!vehicle) {
-        console.log("❌ Veículo não encontrado:", id);
-        throw new Error(MESSAGES.error.vehicleNotFound);
-      }
-      return { vehicle, simulated: true };
+      throw new Error("Veículo não encontrado.");
     }
   }
 
   async getVehicleByQrCode(qrCode) {
-    console.log("📱 ApiService.getVehicleByQrCode iniciado:", qrCode);
-    await this.simulateDelay();
-
     try {
-      const response = await api.get(`/vehicles/qr/${qrCode}`);
+      const response = await api.get(`/carros/qr/${qrCode}`);
       return response.data;
     } catch (error) {
-      console.log("🔄 Backend não disponível - buscando por QR local");
-      const vehicle = LocalStorageService.getVehicleByQrCode(qrCode);
-      if (!vehicle) {
-        console.log("❌ QR Code não encontrado:", qrCode);
-        throw new Error(MESSAGES.error.vehicleNotFound);
-      }
-      return { vehicle, simulated: true };
+      throw new Error("QR Code não encontrado.");
     }
   }
 
   // CHECK-IN/CHECK-OUT
   async checkInVehicle(data) {
-    console.log("📥 ApiService.checkInVehicle iniciado:", data.qrCode);
-    await this.simulateDelay();
-
     try {
-      const response = await api.post("/vehicles/checkin", data);
+      const response = await api.post("/checkin", data);
       return response.data;
     } catch (error) {
-      console.log("🔄 Backend não disponível - fazendo check-in local");
-
-      // Fallback para simulação
-      const vehicle = LocalStorageService.getVehicleByQrCode(data.qrCode);
-
-      if (!vehicle) {
-        console.log("❌ Veículo não encontrado para check-in:", data.qrCode);
-        throw new Error(MESSAGES.error.vehicleNotFound);
-      }
-
-      if (vehicle.status === "in_use") {
-        console.log("❌ Veículo já em uso:", vehicle.plate);
-        throw new Error(MESSAGES.error.vehicleInUse);
-      }
-
-      const currentUser = LocalStorageService.getCurrentUser();
-      if (!currentUser) {
-        throw new Error("Usuário não autenticado");
-      }
-
-      // Atualizar veículo
-      const updatedVehicle = LocalStorageService.updateVehicle(vehicle.id, {
-        status: "in_use",
-        currentUserId: currentUser.id,
-        lastCheckIn: new Date().toISOString(),
-      });
-
-      // Adicionar ao histórico
-      const historyEntry = LocalStorageService.addHistoryEntry({
-        vehicleId: vehicle.id,
-        userId: currentUser.id,
-        userName: currentUser.name,
-        vehiclePlate: vehicle.plate,
-        action: "checkin",
-        location: data.location || "Não informado",
-        odometer: data.odometer || vehicle.odometer,
-        fuelLevel: data.fuelLevel || vehicle.fuelLevel,
-        notes: data.notes || "",
-      });
-
-      console.log("✅ Check-in local realizado:", vehicle.plate);
-
-      return {
-        vehicle: updatedVehicle,
-        history: historyEntry,
-        message: MESSAGES.success.checkIn,
-        simulated: true,
-      };
+      throw new Error("Erro ao realizar check-in.");
     }
   }
 
   async checkOutVehicle(data) {
-    console.log("📤 ApiService.checkOutVehicle iniciado:", data.qrCode);
-    await this.simulateDelay();
-
     try {
-      const response = await api.post("/vehicles/checkout", data);
+      const response = await api.post("/checkout", data);
       return response.data;
     } catch (error) {
-      console.log("🔄 Backend não disponível - fazendo check-out local");
-
-      // Fallback para simulação
-      const vehicle = LocalStorageService.getVehicleByQrCode(data.qrCode);
-
-      if (!vehicle) {
-        console.log("❌ Veículo não encontrado para check-out:", data.qrCode);
-        throw new Error(MESSAGES.error.vehicleNotFound);
-      }
-
-      const currentUser = LocalStorageService.getCurrentUser();
-      if (!currentUser) {
-        throw new Error("Usuário não autenticado");
-      }
-
-      if (
-        vehicle.status !== "in_use" ||
-        vehicle.currentUserId !== currentUser.id
-      ) {
-        console.log("❌ Veículo não está em uso pelo usuário:", vehicle.plate);
-        throw new Error(MESSAGES.error.vehicleNotInUse);
-      }
-
-      // Atualizar veículo
-      const updatedVehicle = LocalStorageService.updateVehicle(vehicle.id, {
-        status: "available",
-        currentUserId: null,
-        lastCheckOut: new Date().toISOString(),
-        odometer: data.odometer || vehicle.odometer,
-        fuelLevel: data.fuelLevel || vehicle.fuelLevel,
-      });
-
-      // Adicionar ao histórico
-      const historyEntry = LocalStorageService.addHistoryEntry({
-        vehicleId: vehicle.id,
-        userId: currentUser.id,
-        userName: currentUser.name,
-        vehiclePlate: vehicle.plate,
-        action: "checkout",
-        location: data.location || "Não informado",
-        odometer: data.odometer || vehicle.odometer,
-        fuelLevel: data.fuelLevel || vehicle.fuelLevel,
-        notes: data.notes || "",
-      });
-
-      console.log("✅ Check-out local realizado:", vehicle.plate);
-
-      return {
-        vehicle: updatedVehicle,
-        history: historyEntry,
-        message: MESSAGES.success.checkOut,
-        simulated: true,
-      };
+      throw new Error("Erro ao realizar check-out.");
     }
   }
 
-  // HISTÓRICO
-  async getVehicleHistory(userId = null) {
-    console.log("📋 ApiService.getVehicleHistory iniciado:", userId);
-    await this.simulateDelay();
-
+  // ROTAS (endpoints futuros)
+  async getRoutes() {
     try {
-      const response = await api.get(
-        `/history${userId ? `?userId=${userId}` : ""}`
-      );
+      const response = await api.get("/rotas");
       return response.data;
     } catch (error) {
-      console.log("🔄 Backend não disponível - retornando histórico local");
-      const history = userId
-        ? LocalStorageService.getHistoryByUserId(userId)
-        : LocalStorageService.getAllHistory();
-
-      return {
-        history,
-        simulated: true,
-      };
+      throw new Error("Erro ao buscar rotas.");
     }
   }
 
-  // SOLICITAÇÕES DE SERVIÇO
-  async getServiceRequests(userId = null) {
-    console.log("🔧 ApiService.getServiceRequests iniciado:", userId);
-    await this.simulateDelay();
-
+  // RELATÓRIOS
+  async getReports() {
     try {
-      const response = await api.get(
-        `/service-requests${userId ? `?userId=${userId}` : ""}`
-      );
+      const response = await api.get("/relatorios");
       return response.data;
     } catch (error) {
-      console.log("🔄 Backend não disponível - retornando solicitações locais");
-      const requests = userId
-        ? LocalStorageService.getServiceRequestsByUserId(userId)
-        : LocalStorageService.getAllServiceRequests();
-
-      return {
-        requests,
-        simulated: true,
-      };
+      throw new Error("Erro ao buscar relatórios.");
     }
   }
 
-  async createServiceRequest(requestData) {
-    console.log("🔧 ApiService.createServiceRequest iniciado");
-    await this.simulateDelay();
-
+  // DASHBOARD
+  async getDashboardData() {
     try {
-      const response = await api.post("/service-requests", requestData);
+      const response = await api.get("/dashboard/totais");
       return response.data;
     } catch (error) {
-      console.log("🔄 Backend não disponível - criando solicitação local");
-
-      const currentUser = LocalStorageService.getCurrentUser();
-      if (!currentUser) {
-        throw new Error("Usuário não autenticado");
-      }
-
-      const vehicle = LocalStorageService.getVehicleById(requestData.vehicleId);
-
-      const newRequest = LocalStorageService.addServiceRequest({
-        ...requestData,
-        userId: currentUser.id,
-        userName: currentUser.name,
-        vehiclePlate: vehicle?.plate || "N/A",
-        status: "pending",
-      });
-
-      console.log("✅ Solicitação local criada:", newRequest.id);
-
-      return {
-        request: newRequest,
-        message: MESSAGES.success.serviceRequest,
-        simulated: true,
-      };
-    }
-  }
-
-  async updateServiceRequest(requestId, updates) {
-    console.log("🔧 ApiService.updateServiceRequest iniciado:", requestId);
-    await this.simulateDelay();
-
-    try {
-      const response = await api.put(`/service-requests/${requestId}`, updates);
-      return response.data;
-    } catch (error) {
-      console.log("🔄 Backend não disponível - atualizando solicitação local");
-
-      const updatedRequest = LocalStorageService.updateServiceRequest(
-        requestId,
-        updates
-      );
-
-      if (!updatedRequest) {
-        console.log("❌ Solicitação não encontrada:", requestId);
-        throw new Error("Solicitação não encontrada");
-      }
-
-      console.log("✅ Solicitação local atualizada:", requestId);
-
-      return {
-        request: updatedRequest,
-        simulated: true,
-      };
+      throw new Error("Erro ao carregar dados do dashboard.");
     }
   }
 }
