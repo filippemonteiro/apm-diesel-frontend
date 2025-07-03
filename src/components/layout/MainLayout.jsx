@@ -145,9 +145,10 @@ function MainLayout({ children }) {
             </Nav>
           </Navbar.Collapse>
 
-          {/* Informações do Usuário */}
+          {/* SEÇÃO CORRIGIDA - Informações do Usuário */}
           <div className="d-flex align-items-center">
-            <div className="text-white me-3 d-none d-md-block text-end">
+            {/* Informações do Usuário - DESKTOP E TABLET (acima de 992px) */}
+            <div className="text-white me-3 d-none d-lg-block text-end">
               <div style={{ fontSize: "0.9rem", fontWeight: "600" }}>
                 {user?.name}
               </div>
@@ -162,7 +163,24 @@ function MainLayout({ children }) {
               </small>
             </div>
 
-            <div className="dropdown">
+            {/* Informações do Usuário - MOBILE E TABLET (até 991px) */}
+            <div className="text-white me-3 d-block d-lg-none">
+              <div style={{ fontSize: "0.85rem", fontWeight: "600" }}>
+                {user?.name?.split(" ")[0]} {/* Apenas primeiro nome */}
+              </div>
+              <small className="text-gold-apm" style={{ fontSize: "0.7rem" }}>
+                {user?.role === "1" || user?.role === "2"
+                  ? "Admin"
+                  : user?.role === "3"
+                  ? "Operador"
+                  : user?.role === "4"
+                  ? "Motorista"
+                  : "Usuário"}
+              </small>
+            </div>
+
+            {/* Dropdown do Usuário - APENAS DESKTOP (acima de 992px) */}
+            <div className="dropdown d-none d-lg-block">
               <Button
                 variant="outline-light"
                 className="dropdown-toggle border-0"
@@ -204,7 +222,7 @@ function MainLayout({ children }) {
         </Container>
       </Navbar>
 
-      {/* Offcanvas Menu Mobile - VERSÃO CORRIGIDA */}
+      {/* Offcanvas Menu Mobile - VERSÃO OTIMIZADA */}
       <Offcanvas
         show={showOffcanvas}
         onHide={() => setShowOffcanvas(false)}
@@ -246,22 +264,33 @@ function MainLayout({ children }) {
             </div>
           </Offcanvas.Title>
         </Offcanvas.Header>
-        
-        <Offcanvas.Body style={{ padding: '1.5rem' }}>
-          {/* Informações do usuário no mobile - CORRIGIDO */}
+
+        <Offcanvas.Body style={{ padding: "1.5rem" }}>
+          {/* Informações do usuário no mobile - MELHORADO */}
           <div
             className="text-center mb-4 p-3 rounded-3"
-            style={{ 
-              backgroundColor: 'var(--primary-dark)', 
-              color: 'white'
+            style={{
+              backgroundColor: "var(--primary-dark)",
+              color: "white",
             }}
           >
             <FaUser size={48} className="text-gold-apm mb-2" />
             <h6 className="mb-1 text-white">{user?.name}</h6>
             <small className="text-gold-apm">{user?.email}</small>
+            <div className="mt-2">
+              <span className="badge bg-gold-apm text-dark px-3 py-1">
+                {user?.role === "1" || user?.role === "2"
+                  ? "Administrador"
+                  : user?.role === "3"
+                  ? "Operador"
+                  : user?.role === "4"
+                  ? "Motorista"
+                  : "Usuário"}
+              </span>
+            </div>
           </div>
 
-          {/* Menu items - CORRIGIDO PARA MELHOR VISIBILIDADE */}
+          {/* Menu items - OTIMIZADO */}
           <Nav className="flex-column gap-2 mb-4">
             {menuItems.map((item, index) => (
               <Link
@@ -269,73 +298,36 @@ function MainLayout({ children }) {
                 to={item.path}
                 className={`nav-link-mobile d-flex align-items-center fw-semibold ${
                   isActiveRoute(item.path)
-                    ? 'nav-link-active'
-                    : 'nav-link-inactive'
+                    ? "nav-link-active"
+                    : "nav-link-inactive"
                 }`}
                 onClick={() => setShowOffcanvas(false)}
-                style={{ 
+                style={{
                   animationDelay: `${(index + 1) * 0.1}s`,
                 }}
               >
-                <span className="me-3 nav-icon">
-                  {item.icon}
-                </span>
+                <span className="me-3 nav-icon">{item.icon}</span>
                 {item.label}
               </Link>
             ))}
           </Nav>
 
-          {/* Botão de logout no mobile - CORRIGIDO */}
-          <div className="mt-4 pt-3 border-top">
+          {/* Botão de logout no mobile - DESTAQUE */}
+          <div className="mb-4">
             <Button
               variant="outline-danger"
               className="w-100 d-flex align-items-center justify-content-center py-3"
               onClick={handleLogout}
-              style={{ 
-                borderRadius: '12px',
-                fontWeight: '600',
-                fontSize: '1rem',
-                transition: 'all 0.3s ease'
+              style={{
+                borderRadius: "12px",
+                fontWeight: "600",
+                fontSize: "1rem",
+                transition: "all 0.3s ease",
               }}
             >
               <FaSignOutAlt className="me-2" />
               Sair do Sistema
             </Button>
-          </div>
-
-          {/* Links sociais com melhor espaçamento - CORRIGIDO */}
-          <div className="mt-4 pt-3 border-top">
-            <div className="d-flex justify-content-center gap-4 mb-3">
-              <a
-                href="https://www.instagram.com/apmdiesel/?hl=pt-br"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="social-link"
-                style={{ 
-                  backgroundColor: 'var(--bg-light)',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                <FaInstagram size={24} />
-              </a>
-              <a
-                href="https://g.co/kgs/WH26CU3"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="social-link"
-                style={{ 
-                  backgroundColor: 'var(--bg-light)',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                <FaMapMarkerAlt size={24} />
-              </a>
-            </div>
-            <div className="text-center">
-              <small className="text-muted">
-                © 2024 APM Diesel - Peças e Serviços
-              </small>
-            </div>
           </div>
         </Offcanvas.Body>
       </Offcanvas>
