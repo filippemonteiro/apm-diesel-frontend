@@ -1,53 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Button, Alert, Spinner, Row, Col } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { 
-  FaEye, 
-  FaEyeSlash, 
-  FaUser, 
-  FaEnvelope, 
-  FaLock, 
+import React, { useState, useEffect } from "react";
+import { Form, Button, Alert, Spinner, Row, Col } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+  FaEye,
+  FaEyeSlash,
+  FaUser,
+  FaEnvelope,
+  FaLock,
   FaUserPlus,
-  FaIdCard
-} from 'react-icons/fa';
-import { useAuth } from '../../context/AuthContext';
-import { USER_ROLES } from '../../utils/constants';
+  FaIdCard,
+} from "react-icons/fa";
+import { useAuth } from "../../context/AuthContext";
+import { USER_ROLES } from "../../utils/constants";
 
 function SignUp() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: USER_ROLES.DRIVER
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    role: USER_ROLES.DRIVER,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const { register, error, clearError, isLoading } = useAuth();
   const navigate = useNavigate();
 
   // Limpar erros quando o componente monta
   useEffect(() => {
     clearError();
-  }, []); // Array de dependências vazio
+  }, [clearError]);
 
   // Manipular mudanças nos inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Limpar erro específico quando usuário começar a digitar
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
@@ -55,40 +55,40 @@ function SignUp() {
   // Validar formulário
   const validateForm = () => {
     const newErrors = {};
-    
+
     // Validar nome
     if (!formData.name.trim()) {
-      newErrors.name = 'Nome é obrigatório';
+      newErrors.name = "Nome é obrigatório";
     } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Nome deve ter pelo menos 2 caracteres';
+      newErrors.name = "Nome deve ter pelo menos 2 caracteres";
     }
-    
+
     // Validar email
     if (!formData.email.trim()) {
-      newErrors.email = 'Email é obrigatório';
+      newErrors.email = "Email é obrigatório";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email inválido';
+      newErrors.email = "Email inválido";
     }
-    
+
     // Validar senha
     if (!formData.password) {
-      newErrors.password = 'Senha é obrigatória';
+      newErrors.password = "Senha é obrigatória";
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
+      newErrors.password = "Senha deve ter pelo menos 6 caracteres";
     }
-    
+
     // Validar confirmação de senha
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Confirme sua senha';
+      newErrors.confirmPassword = "Confirme sua senha";
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Senhas não coincidem';
+      newErrors.confirmPassword = "Senhas não coincidem";
     }
-    
+
     // Validar função
     if (!formData.role) {
-      newErrors.role = 'Selecione uma função';
+      newErrors.role = "Selecione uma função";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -96,26 +96,26 @@ function SignUp() {
   // Submeter formulário
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsSubmitting(true);
     clearError();
-    
+
     try {
       const result = await register(formData);
-      
+
       if (result.success) {
         toast.success(result.message);
-        toast.info('Agora você pode fazer login com suas credenciais');
-        navigate('/login');
+        toast.info("Agora você pode fazer login com suas credenciais");
+        navigate("/login");
       } else {
         toast.error(result.message);
       }
     } catch (err) {
-      toast.error('Erro inesperado. Tente novamente.');
+      toast.error("Erro inesperado. Tente novamente.");
     } finally {
       setIsSubmitting(false);
     }
@@ -129,9 +129,7 @@ function SignUp() {
           <FaUserPlus className="me-2" />
           Criar Conta
         </h4>
-        <p className="text-muted">
-          Cadastre-se para acessar o sistema
-        </p>
+        <p className="text-muted">Cadastre-se para acessar o sistema</p>
       </div>
 
       {/* Alertas de erro global */}
@@ -211,18 +209,17 @@ function SignUp() {
           </Form.Text>
         </Form.Group>
 
-        {/* Senhas lado a lado no desktop */}
-        <Row>
+        {/* Senhas lado a lado no desktop - SEÇÃO CORRIGIDA */}
+        <Row className="g-3 mb-3">
           <Col md={6}>
-            {/* Senha */}
-            <Form.Group className="mb-3">
+            <Form.Group>
               <Form.Label className="fw-semibold">
                 <FaLock className="me-2" />
                 Senha
               </Form.Label>
               <div className="position-relative">
                 <Form.Control
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
@@ -230,14 +227,16 @@ function SignUp() {
                   isInvalid={!!errors.password}
                   disabled={isSubmitting || isLoading}
                   autoComplete="new-password"
+                  style={{
+                    paddingRight: "45px", // Espaço para o botão de mostrar/ocultar
+                  }}
                 />
                 <Button
                   variant="link"
-                  className="position-absolute end-0 top-50 translate-middle-y border-0 text-muted"
-                  style={{ zIndex: 10 }}
+                  className="position-absolute end-0 top-50 translate-middle-y border-0 text-muted password-toggle-btn"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isSubmitting || isLoading}
-                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </Button>
@@ -247,17 +246,16 @@ function SignUp() {
               </Form.Control.Feedback>
             </Form.Group>
           </Col>
-          
+
           <Col md={6}>
-            {/* Confirmar Senha */}
-            <Form.Group className="mb-3">
+            <Form.Group>
               <Form.Label className="fw-semibold">
                 <FaLock className="me-2" />
                 Confirmar Senha
               </Form.Label>
               <div className="position-relative">
                 <Form.Control
-                  type={showConfirmPassword ? 'text' : 'password'}
+                  type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
@@ -265,14 +263,18 @@ function SignUp() {
                   isInvalid={!!errors.confirmPassword}
                   disabled={isSubmitting || isLoading}
                   autoComplete="new-password"
+                  style={{
+                    paddingRight: "45px", // Espaço para o botão de mostrar/ocultar
+                  }}
                 />
                 <Button
                   variant="link"
-                  className="position-absolute end-0 top-50 translate-middle-y border-0 text-muted"
-                  style={{ zIndex: 10 }}
+                  className="position-absolute end-0 top-50 translate-middle-y border-0 text-muted password-toggle-btn"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   disabled={isSubmitting || isLoading}
-                  aria-label={showConfirmPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                  aria-label={
+                    showConfirmPassword ? "Ocultar senha" : "Mostrar senha"
+                  }
                 >
                   {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                 </Button>
@@ -287,7 +289,8 @@ function SignUp() {
         {/* Política de privacidade */}
         <div className="mb-3">
           <Form.Text className="text-muted small">
-            Ao criar uma conta, você concorda com nossos termos de uso e política de privacidade.
+            Ao criar uma conta, você concorda com nossos termos de uso e
+            política de privacidade.
           </Form.Text>
         </div>
 
@@ -321,9 +324,9 @@ function SignUp() {
         {/* Link para login */}
         <div className="text-center">
           <p className="mb-0">
-            Já tem uma conta?{' '}
-            <Link 
-              to="/login" 
+            Já tem uma conta?{" "}
+            <Link
+              to="/login"
               className="text-decoration-none text-primary-apm fw-semibold"
             >
               Faça login
