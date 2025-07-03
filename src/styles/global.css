@@ -1,5 +1,5 @@
 /* Estilos globais da aplicação APM Diesel - Design System Refinado */
-@import url('./variables.css');
+@import url("./variables.css");
 
 /* Reset básico */
 * {
@@ -10,7 +10,7 @@
 
 /* Configurações globais do body */
 body {
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--bg-light);
   color: var(--text-dark);
   line-height: 1.6;
@@ -258,6 +258,24 @@ body {
   box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
 }
 
+/* MELHORIA PARA BOTÕES DE MOSTRAR/OCULTAR SENHA */
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none !important;
+  border: none !important;
+  color: var(--text-muted) !important;
+  padding: 0.25rem 0.5rem !important;
+  z-index: 10;
+  transition: color 0.3s ease;
+}
+
+.password-toggle-btn:hover {
+  color: var(--primary-dark) !important;
+}
+
 /* CARDS REFINADOS */
 .card {
   border: none;
@@ -446,16 +464,90 @@ body {
   background-color: var(--bg-white);
 }
 
-/* OFFCANVAS REFINADO */
+/* OFFCANVAS REFINADO - CORREÇÕES APLICADAS */
 .offcanvas {
   border: none;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+  width: 300px !important;
 }
 
 .offcanvas-header {
   background-color: var(--primary-dark);
   color: var(--primary-white);
   border-bottom: none;
+  padding: 1.5rem;
+}
+
+.offcanvas-body {
+  padding: 1.5rem;
+}
+
+/* MELHOR CONTRASTE PARA LINKS DO MENU MOBILE */
+.nav-link-mobile {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 1rem !important;
+  margin-bottom: 0.5rem;
+  border-radius: 12px !important;
+  transition: all 0.3s ease;
+  text-decoration: none !important;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  animation: slideInLeft 0.3s ease forwards;
+}
+
+.nav-link-active {
+  background-color: var(--primary-dark) !important;
+  color: var(--primary-white) !important;
+  border: none;
+  box-shadow: 0 4px 12px rgba(26, 31, 58, 0.3);
+}
+
+.nav-link-inactive {
+  background-color: var(--bg-light) !important;
+  color: var(--primary-dark) !important;
+  border: 1px solid var(--border-light);
+}
+
+.nav-link-inactive:hover {
+  background-color: var(--primary-gold) !important;
+  color: var(--primary-dark) !important;
+  border-color: var(--primary-gold);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.nav-icon {
+  font-size: 1.1rem;
+  min-width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* LINKS SOCIAIS MOBILE */
+.social-link {
+  text-decoration: none;
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.social-link:hover {
+  background-color: var(--primary-gold) !important;
+  color: white !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+/* CLASSE ESPECÍFICA PARA OFFCANVAS MOBILE */
+.mobile-menu-offcanvas {
+  width: 300px !important;
 }
 
 /* SCROLLBAR REMOVIDA EM TELAS DE AUTH */
@@ -519,30 +611,68 @@ body {
   }
 }
 
+/* ANIMAÇÕES PARA MENU MOBILE */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* MELHOR FEEDBACK VISUAL PARA ESTADOS DE ERRO */
+.form-control.is-invalid {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15) !important;
+}
+
+.form-control.is-invalid:focus {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25) !important;
+}
+
 /* RESPONSIVIDADE REFINADA */
 @media (max-width: 768px) {
   .btn {
     width: 100%;
     margin-bottom: 0.75rem;
   }
-  
+
   .btn:last-child {
     margin-bottom: 0;
   }
-  
+
   .card {
     margin-bottom: 1rem;
     border-radius: 12px;
   }
-  
+
   .container-fluid {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
+
   /* Card com padding responsivo */
   .card .card-body {
     padding: 2rem 1.5rem !important;
+  }
+
+  /* Offcanvas mobile */
+  .mobile-menu-offcanvas {
+    width: 280px !important;
+  }
+
+  /* Formulário responsivo */
+  .form-row-passwords {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .form-row-passwords .form-group {
+    min-width: 100%;
   }
 }
 
@@ -551,20 +681,34 @@ body {
     padding: 14px 16px;
     font-size: 0.9rem;
   }
-  
+
   .btn-sm {
     padding: 10px 12px;
     font-size: 0.8rem;
   }
-  
+
   .btn-lg {
     padding: 18px 20px;
     font-size: 1rem;
   }
-  
+
   /* Card mobile com padding ainda menor */
   .card .card-body {
     padding: 1.5rem 1.25rem !important;
+  }
+
+  /* Offcanvas ainda menor */
+  .mobile-menu-offcanvas {
+    width: 260px !important;
+  }
+
+  .offcanvas-body {
+    padding: 1rem;
+  }
+
+  .nav-link-mobile {
+    font-size: 0.9rem !important;
+    padding: 0.6rem 0.8rem !important;
   }
 }
 
