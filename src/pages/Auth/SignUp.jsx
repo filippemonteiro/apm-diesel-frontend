@@ -210,7 +210,7 @@ function SignUp() {
         </Form.Group>
 
         {/* Senhas lado a lado no desktop - SEÇÃO CORRIGIDA */}
-        <Row className="g-3 mb-3">
+        <Row className="g-3 mb-3 password-row">
           <Col md={6}>
             <Form.Group>
               <Form.Label className="fw-semibold">

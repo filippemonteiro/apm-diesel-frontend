@@ -20,7 +20,7 @@ function Login() {
   // Limpar erros quando o componente monta
   useEffect(() => {
     clearError();
-  }, []); // Array vazio - executa apenas na montagem
+  }, [clearError]);
 
   // Manipular mudanças nos inputs
   const handleChange = (e) => {

@@ -22,7 +22,7 @@ function ResetPassword() {
   // Limpar erros quando o componente monta
   useEffect(() => {
     clearError();
-  }, []); // Array de dependências vazio
+  }, [clearError]);
 
   // Manipular mudança no input de email
   const handleChange = (e) => {

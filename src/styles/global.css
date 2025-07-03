@@ -552,12 +552,14 @@ body {
 
 /* SCROLLBAR REMOVIDA EM TELAS DE AUTH */
 .auth-page {
-  overflow: hidden;
-  height: 100vh;
+  overflow-x: hidden;
+  min-height: 100vh;
+  /* Scroll completo habilitado */
+  overflow-y: auto;
 }
 
 .auth-page body {
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* SCROLLBAR CUSTOMIZADA (apenas para páginas internas) */
@@ -720,4 +722,171 @@ body {
 *:focus-visible {
   outline: 2px solid var(--primary-gold);
   outline-offset: 2px;
+}
+
+/* CORREÇÃO ESPECÍFICA PARA CARDS DE AUTENTICAÇÃO */
+.auth-page .card {
+  /* Garantir largura adequada apenas em desktop */
+  width: 100%;
+}
+
+/* Aplicar min-width apenas em telas maiores */
+@media (min-width: 768px) {
+  .auth-page .card {
+    min-width: 450px;
+    max-width: 600px;
+  }
+}
+
+/* CORREÇÃO PARA FORMULÁRIOS DE AUTENTICAÇÃO */
+.auth-page .form-control {
+  /* Garantir altura e espaçamento adequados */
+  min-height: 50px;
+  padding: 14px 16px;
+}
+
+.auth-page .form-select {
+  /* Garantir altura consistente */
+  min-height: 50px;
+  padding: 14px 16px;
+}
+
+/* ESPAÇAMENTO MELHORADO PARA FORMULÁRIOS */
+.auth-page .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.auth-page .mb-3 {
+  margin-bottom: 1.5rem !important;
+}
+
+/* CORREÇÃO ESPECÍFICA PARA CAMPOS DE SENHA LADO A LADO */
+.auth-page .row.g-3 {
+  /* Remover margens negativas que desalinham */
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.auth-page .row.g-3 > .col-md-6 {
+  /* Padding consistente sem desalinhamento */
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Espaçamento entre campos de senha em mobile */
+@media (max-width: 767px) {
+  .auth-page .row.g-3 > .col-md-6:first-child {
+    margin-bottom: 0.75rem;
+  }
+
+  .auth-page .row.g-3 > .col-md-6:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Para desktop - manter gap entre colunas */
+@media (min-width: 768px) {
+  .auth-page .row.g-3 > .col-md-6:first-child {
+    padding-right: 0.5rem !important;
+  }
+
+  .auth-page .row.g-3 > .col-md-6:last-child {
+    padding-left: 0.5rem !important;
+  }
+}
+
+/* GARANTIR QUE CAMPOS DE SENHA FIQUEM LADO A LADO ATÉ 768px */
+@media (min-width: 768px) {
+  .auth-page .password-row {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .auth-page .password-row .col-md-6 {
+    flex: 1;
+  }
+}
+
+/* RESPONSIVIDADE ESPECÍFICA PARA AUTENTICAÇÃO */
+@media (max-width: 767px) {
+  .auth-page .card {
+    /* Mobile: sem restrições de largura */
+    min-width: unset !important;
+    max-width: unset !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .auth-page .card-body {
+    /* Padding mobile com mais respiração */
+    padding: 2rem 1.5rem !important;
+  }
+
+  /* Em mobile, campos de senha empilham */
+  .auth-page .row.g-3 > .col-md-6 {
+    padding-left: 0;
+    padding-right: 0;
+    margin-bottom: 1rem;
+  }
+
+  /* Espaçamento extra entre elementos */
+  .auth-page .form-group,
+  .auth-page .mb-3 {
+    margin-bottom: 1.75rem !important;
+  }
+
+  /* Título com mais espaço */
+  .auth-page .text-center.mb-4 {
+    margin-bottom: 2rem !important;
+  }
+
+  /* Botão com mais espaço */
+  .auth-page .btn-lg {
+    padding: 18px 24px;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem !important;
+  }
+}
+
+@media (max-width: 991px) and (min-width: 768px) {
+  .auth-page .card {
+    /* Tablets: largura mínima reduzida */
+    min-width: 400px;
+  }
+
+  .auth-page .card-body {
+    /* Padding para tablets com mais respiração */
+    padding: 2.5rem 2rem !important;
+  }
+
+  /* Espaçamento adequado em tablets */
+  .auth-page .form-group,
+  .auth-page .mb-3 {
+    margin-bottom: 1.5rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .auth-page .card {
+    /* Mobile pequeno: sem margens problemáticas */
+    margin: 0 !important;
+    width: 100% !important;
+    min-width: unset !important;
+    max-width: unset !important;
+  }
+
+  .auth-page .card-body {
+    /* Padding com boa respiração mesmo em mobile pequeno */
+    padding: 1.75rem 1.25rem !important;
+  }
+
+  /* Ajustar espaçamentos para mobile pequeno */
+  .auth-page .form-group,
+  .auth-page .mb-3 {
+    margin-bottom: 1.5rem !important;
+  }
+
+  .auth-page .text-center.mb-4 {
+    margin-bottom: 1.75rem !important;
+  }
 }
