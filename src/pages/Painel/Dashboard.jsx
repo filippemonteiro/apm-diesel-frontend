@@ -1,172 +1,213 @@
-import React from "react";
-import { Container, Row, Col, Card, Button, Alert } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { 
-  FaTachometerAlt, 
-  FaCar, 
-  FaTools, 
-  FaHistory, 
-  FaQrcode,
-  FaCheckCircle,
-  FaExclamationTriangle
-} from "react-icons/fa";
-import { useAuth } from "../../context/AuthContext";
-import LocalStorageService from "../../services/localStorage";
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Alert, Spinner } from 'react-bootstrap';
+import { FaCar, FaUsers, FaTools, FaChartLine } from 'react-icons/fa';
+import ApiService from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 
-function Painel() {
+function Dashboard() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [stats, setStats] = useState({
+    totalVehicles: 0,
+    availableVehicles: 0,
+    inUseVehicles: 0,
+    maintenanceVehicles: 0,
+    totalUsers: 0,
+    pendingRequests: 0
+  });
+
   const { user } = useAuth();
-  const navigate = useNavigate();
-  
-  // Buscar estatísticas
-  const vehicles = LocalStorageService.getAllVehicles();
-  const availableVehicles = vehicles.filter(v => v.status === 'available').length;
-  const inUseVehicles = vehicles.filter(v => v.status === 'in_use').length;
-  const maintenanceVehicles = vehicles.filter(v => v.status === 'maintenance').length;
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Tentar carregar dados do backend
+      const dashboardData = await ApiService.getDashboardData();
+      
+      setStats({
+        totalVehicles: dashboardData.total_carros || 0,
+        availableVehicles: dashboardData.carros_disponiveis || 0,
+        inUseVehicles: dashboardData.carros_em_uso || 0,
+        maintenanceVehicles: dashboardData.carros_manutencao || 0,
+        totalUsers: dashboardData.total_usuarios || 0,
+        pendingRequests: dashboardData.chamados_pendentes || 0
+      });
+
+    } catch (error) {
+      console.error('Erro ao carregar dashboard:', error);
+      
+      // Se a API não estiver disponível, mostrar dados vazios ou de exemplo
+      setStats({
+        totalVehicles: 0,
+        availableVehicles: 0,
+        inUseVehicles: 0,
+        maintenanceVehicles: 0,
+        totalUsers: 1, // Pelo menos o usuário logado
+        pendingRequests: 0
+      });
+      
+      setError('Não foi possível carregar os dados do dashboard. Conecte-se ao backend.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Container className="mt-4">
+        <div className="text-center">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-3">Carregando dados do dashboard...</p>
+        </div>
+      </Container>
+    );
+  }
 
   return (
-    <Container fluid>
-      <Row>
+    <Container className="mt-4">
+      {/* Cabeçalho */}
+      <Row className="mb-4">
         <Col>
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <div>
-              <h2 className="text-primary-apm mb-1">
-                <FaTachometerAlt className="me-2" />
-                Painel
-              </h2>
+          <h2 className="text-primary-apm fw-bold">
+            Dashboard
+          </h2>
+          <p className="text-muted">
+            Bem-vindo, {user?.name || 'Usuário'}! Aqui está um resumo do sistema.
+          </p>
+        </Col>
+      </Row>
+
+      {/* Alerta de erro */}
+      {error && (
+        <Alert variant="warning" className="mb-4">
+          <Alert.Heading>⚠️ Aviso</Alert.Heading>
+          {error}
+        </Alert>
+      )}
+
+      {/* Cards de Estatísticas */}
+      <Row className="g-4">
+        {/* Total de Veículos */}
+        <Col md={6} lg={3}>
+          <Card className="h-100 border-0 shadow-sm">
+            <Card.Body className="d-flex align-items-center">
+              <div className="bg-primary text-white rounded-circle p-3 me-3">
+                <FaCar size={24} />
+              </div>
+              <div>
+                <h5 className="mb-0">{stats.totalVehicles}</h5>
+                <small className="text-muted">Total de Veículos</small>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        {/* Veículos Disponíveis */}
+        <Col md={6} lg={3}>
+          <Card className="h-100 border-0 shadow-sm">
+            <Card.Body className="d-flex align-items-center">
+              <div className="bg-success text-white rounded-circle p-3 me-3">
+                <FaCar size={24} />
+              </div>
+              <div>
+                <h5 className="mb-0">{stats.availableVehicles}</h5>
+                <small className="text-muted">Disponíveis</small>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        {/* Veículos em Uso */}
+        <Col md={6} lg={3}>
+          <Card className="h-100 border-0 shadow-sm">
+            <Card.Body className="d-flex align-items-center">
+              <div className="bg-warning text-white rounded-circle p-3 me-3">
+                <FaCar size={24} />
+              </div>
+              <div>
+                <h5 className="mb-0">{stats.inUseVehicles}</h5>
+                <small className="text-muted">Em Uso</small>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        {/* Veículos em Manutenção */}
+        <Col md={6} lg={3}>
+          <Card className="h-100 border-0 shadow-sm">
+            <Card.Body className="d-flex align-items-center">
+              <div className="bg-danger text-white rounded-circle p-3 me-3">
+                <FaTools size={24} />
+              </div>
+              <div>
+                <h5 className="mb-0">{stats.maintenanceVehicles}</h5>
+                <small className="text-muted">Em Manutenção</small>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Segunda linha de estatísticas */}
+      <Row className="g-4 mt-2">
+        {/* Total de Usuários */}
+        <Col md={6}>
+          <Card className="h-100 border-0 shadow-sm">
+            <Card.Body className="d-flex align-items-center">
+              <div className="bg-info text-white rounded-circle p-3 me-3">
+                <FaUsers size={24} />
+              </div>
+              <div>
+                <h5 className="mb-0">{stats.totalUsers}</h5>
+                <small className="text-muted">Usuários Cadastrados</small>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        {/* Chamados Pendentes */}
+        <Col md={6}>
+          <Card className="h-100 border-0 shadow-sm">
+            <Card.Body className="d-flex align-items-center">
+              <div className="bg-secondary text-white rounded-circle p-3 me-3">
+                <FaChartLine size={24} />
+              </div>
+              <div>
+                <h5 className="mb-0">{stats.pendingRequests}</h5>
+                <small className="text-muted">Chamados Pendentes</small>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Informações do Sistema */}
+      <Row className="mt-4">
+        <Col>
+          <Card className="border-0 shadow-sm">
+            <Card.Body>
+              <h5 className="text-primary-apm">Status do Sistema</h5>
               <p className="text-muted mb-0">
-                Bem-vindo, {user?.name}! Gerencie sua frota aqui.
+                {error 
+                  ? '🔴 Backend desconectado - Dados limitados disponíveis'
+                  : '🟢 Sistema funcionando normalmente'
+                }
               </p>
-            </div>
-          </div>
-
-          {/* Estatísticas */}
-          <Row className="g-3 mb-4">
-            <Col md={4}>
-              <Card className="border-0 shadow-sm">
-                <Card.Body className="d-flex align-items-center">
-                  <div className="flex-shrink-0">
-                    <FaCheckCircle size={32} className="text-success" />
-                  </div>
-                  <div className="flex-grow-1 ms-3">
-                    <h6 className="text-muted mb-0">Disponíveis</h6>
-                    <h3 className="mb-0">{availableVehicles}</h3>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={4}>
-              <Card className="border-0 shadow-sm">
-                <Card.Body className="d-flex align-items-center">
-                  <div className="flex-shrink-0">
-                    <FaCar size={32} className="text-warning" />
-                  </div>
-                  <div className="flex-grow-1 ms-3">
-                    <h6 className="text-muted mb-0">Em Uso</h6>
-                    <h3 className="mb-0">{inUseVehicles}</h3>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={4}>
-              <Card className="border-0 shadow-sm">
-                <Card.Body className="d-flex align-items-center">
-                  <div className="flex-shrink-0">
-                    <FaExclamationTriangle size={32} className="text-danger" />
-                  </div>
-                  <div className="flex-grow-1 ms-3">
-                    <h6 className="text-muted mb-0">Manutenção</h6>
-                    <h3 className="mb-0">{maintenanceVehicles}</h3>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-
-          {/* Menu de Ações */}
-          <Row className="g-4">
-            <Col md={6} lg={3}>
-              <Card className="h-100 border-0 shadow-sm">
-                <Card.Body className="text-center">
-                  <FaCar size={40} className="text-primary mb-3" />
-                  <h5>Check-in</h5>
-                  <p className="text-muted">Retirar veículo</p>
-                  <Button 
-                    variant="primary" 
-                    onClick={() => navigate('/checkin')}
-                  >
-                    Acessar
-                  </Button>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col md={6} lg={3}>
-              <Card className="h-100 border-0 shadow-sm">
-                <Card.Body className="text-center">
-                  <FaCar size={40} className="text-warning mb-3" />
-                  <h5>Check-out</h5>
-                  <p className="text-muted">Devolver veículo</p>
-                  <Button 
-                    variant="warning" 
-                    onClick={() => navigate('/checkout')}
-                  >
-                    Acessar
-                  </Button>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col md={6} lg={3}>
-              <Card className="h-100 border-0 shadow-sm">
-                <Card.Body className="text-center">
-                  <FaTools size={40} className="text-success mb-3" />
-                  <h5>Serviços</h5>
-                  <p className="text-muted">Solicitar manutenção</p>
-                  <Button 
-                    variant="success" 
-                    onClick={() => navigate('/service-request')}
-                  >
-                    Acessar
-                  </Button>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col md={6} lg={3}>
-              <Card className="h-100 border-0 shadow-sm">
-                <Card.Body className="text-center">
-                  <FaHistory size={40} className="text-info mb-3" />
-                  <h5>Histórico</h5>
-                  <p className="text-muted">Ver atividades</p>
-                  <Button 
-                    variant="info" 
-                    onClick={() => navigate('/service-history')}
-                  >
-                    Acessar
-                  </Button>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-
-          {/* Link para QR Codes */}
-          <Alert variant="light" className="mt-4 d-flex align-items-center justify-content-between">
-            <div>
-              <FaQrcode className="me-2" />
-              <strong>Teste o Sistema:</strong> Para testar o check-in e check-out, você precisa dos QR Codes dos veículos.
-            </div>
-            <Button 
-              variant="outline-primary" 
-              size="sm" 
-              onClick={() => navigate('/qr-codes')}
-            >
-              Ver QR Codes
-            </Button>
-          </Alert>
+              <small className="text-muted">
+                Última atualização: {new Date().toLocaleString('pt-BR')}
+              </small>
+            </Card.Body>
+          </Card>
         </Col>
       </Row>
     </Container>
   );
 }
 
-export default Painel;
+export default Dashboard;

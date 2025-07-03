@@ -1,13 +1,18 @@
-import React, { createContext, useContext, useReducer, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  useCallback,
+} from "react";
 import AuthService from "../services/auth";
 import LocalStorageService from "../services/localStorage";
-import { USER_ROLES } from "../utils/constants";
 
 // Estado inicial
 const initialState = {
   user: null,
   isAuthenticated: false,
-  isLoading: true, // Importante: inicia como true
+  isLoading: true,
   error: null,
 };
 
@@ -21,7 +26,6 @@ const AUTH_ACTIONS = {
   SET_ERROR: "SET_ERROR",
   CLEAR_ERROR: "CLEAR_ERROR",
   UPDATE_USER: "UPDATE_USER",
-  INIT_SUCCESS: "INIT_SUCCESS", // Nova action para inicialização
 };
 
 // Reducer
@@ -86,15 +90,6 @@ function authReducer(state, action) {
         user: action.payload.user,
       };
 
-    case AUTH_ACTIONS.INIT_SUCCESS:
-      return {
-        ...state,
-        user: action.payload.user,
-        isAuthenticated: true,
-        isLoading: false,
-        error: null,
-      };
-
     default:
       return state;
   }
@@ -111,49 +106,17 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Inicializar dados padrão se necessário
-        LocalStorageService.initializeDefaultData();
-
-        // Verificar se existe usuário e token no localStorage
-        const user = LocalStorageService.getCurrentUser();
-        const token = LocalStorageService.getAuthToken();
-
-        console.log('🔍 Verificando autenticação:', { user: !!user, token: !!token });
-
-        if (user && token) {
-          // Verificar se o token não expirou
-          try {
-            const tokenData = JSON.parse(atob(token));
-            const isTokenValid = Date.now() < tokenData.exp;
-            
-            console.log('🔑 Token válido:', isTokenValid);
-
-            if (isTokenValid) {
-              // Token válido, usuário autenticado
-              dispatch({
-                type: AUTH_ACTIONS.INIT_SUCCESS,
-                payload: { user },
-              });
-              console.log('✅ Usuário autenticado automaticamente:', user.name);
-            } else {
-              // Token expirado, limpar dados
-              console.log('❌ Token expirado, fazendo logout');
-              LocalStorageService.clearAuthData();
-              dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
-            }
-          } catch (tokenError) {
-            // Token inválido, limpar dados
-            console.log('❌ Token inválido:', tokenError);
-            LocalStorageService.clearAuthData();
-            dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
-          }
+        const isAuth = AuthService.isAuthenticated();
+        if (isAuth) {
+          const user = AuthService.getCurrentUser();
+          dispatch({
+            type: AUTH_ACTIONS.LOGIN_SUCCESS,
+            payload: { user },
+          });
         } else {
-          // Sem usuário ou token, não autenticado
-          console.log('❌ Nenhum usuário ou token encontrado');
           dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
         }
       } catch (error) {
-        console.error('❌ Erro ao verificar autenticação:', error);
         dispatch({
           type: AUTH_ACTIONS.LOGIN_FAILURE,
           payload: { error: error.message },
@@ -162,10 +125,10 @@ export function AuthProvider({ children }) {
     };
 
     checkAuth();
-  }, []); // Dependência vazia é correta aqui
+  }, []);
 
-  // Função de login
-  const login = async (credentials) => {
+  // Função de login com useCallback
+  const login = useCallback(async (credentials) => {
     dispatch({ type: AUTH_ACTIONS.LOGIN_START });
 
     try {
@@ -176,7 +139,6 @@ export function AuthProvider({ children }) {
           type: AUTH_ACTIONS.LOGIN_SUCCESS,
           payload: { user: result.user },
         });
-        console.log('✅ Login realizado:', result.user.name);
         return { success: true, message: result.message };
       } else {
         dispatch({
@@ -192,17 +154,16 @@ export function AuthProvider({ children }) {
       });
       return { success: false, message: error.message };
     }
-  };
+  }, []);
 
-  // Função de registro
-  const register = async (userData) => {
+  // Função de registro com useCallback
+  const register = useCallback(async (userData) => {
     dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
 
     try {
       const result = await AuthService.register(userData);
 
       if (result.success) {
-        // Após registro bem-sucedido, redirecionar para login
         dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
         return { success: true, message: result.message };
       } else {
@@ -219,10 +180,10 @@ export function AuthProvider({ children }) {
       });
       return { success: false, message: error.message };
     }
-  };
+  }, []);
 
-  // Função de recuperação de senha
-  const resetPassword = async (email) => {
+  // Função de recuperação de senha com useCallback
+  const resetPassword = useCallback(async (email) => {
     dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
 
     try {
@@ -236,25 +197,27 @@ export function AuthProvider({ children }) {
       });
       return { success: false, message: error.message };
     }
-  };
+  }, []);
 
-  // Função de logout
-  const logout = async () => {
+  // Função de logout com useCallback
+  const logout = useCallback(async () => {
     try {
       await AuthService.logout();
       dispatch({ type: AUTH_ACTIONS.LOGOUT });
-      console.log('✅ Logout realizado');
       return { success: true };
     } catch (error) {
-      // Mesmo com erro, faz logout local
       dispatch({ type: AUTH_ACTIONS.LOGOUT });
-      console.log('✅ Logout local realizado');
       return { success: true };
     }
-  };
+  }, []);
 
-  // Atualizar dados do usuário
-  const updateUser = (userData) => {
+  // Limpar erro com useCallback
+  const clearError = useCallback(() => {
+    dispatch({ type: AUTH_ACTIONS.CLEAR_ERROR });
+  }, []);
+
+  // Atualizar dados do usuário com useCallback
+  const updateUser = useCallback((userData) => {
     const updatedUser = AuthService.updateCurrentUser(userData);
     if (updatedUser) {
       dispatch({
@@ -262,43 +225,41 @@ export function AuthProvider({ children }) {
         payload: { user: updatedUser },
       });
     }
-  };
+  }, []);
 
-  // Limpar erro
-  const clearError = () => {
-    dispatch({ type: AUTH_ACTIONS.CLEAR_ERROR });
-  };
+  // Verificar permissões com useCallback
+  const hasPermission = useCallback(
+    (permission) => {
+      if (!state.user) return false;
 
-  // Verificar permissões
-  const hasPermission = (permission) => {
-    if (!state.user) return false;
+      switch (permission) {
+        case "admin":
+          return AuthService.isAdmin();
+        case "manager":
+          return AuthService.isManager();
+        case "driver":
+          return AuthService.isDriver();
+        default:
+          return false;
+      }
+    },
+    [state.user]
+  );
 
-    switch (permission) {
-      case "admin":
-        return AuthService.isAdmin();
-      case "manager":
-        return AuthService.isManager();
-      case "driver":
-        return AuthService.isDriver();
-      default:
-        return false;
-    }
-  };
-
-  // Verificar se pode acessar veículo
-  const canAccessVehicle = (vehicleId) => {
+  // Verificar se pode acessar veículo com useCallback
+  const canAccessVehicle = useCallback((vehicleId) => {
     return AuthService.canAccessVehicle(vehicleId);
-  };
+  }, []);
 
-  // Verificar se pode fazer check-in
-  const canCheckIn = (vehicleId) => {
+  // Verificar se pode fazer check-in com useCallback
+  const canCheckIn = useCallback((vehicleId) => {
     return AuthService.canCheckIn(vehicleId);
-  };
+  }, []);
 
-  // Verificar se pode fazer check-out
-  const canCheckOut = (vehicleId) => {
+  // Verificar se pode fazer check-out com useCallback
+  const canCheckOut = useCallback((vehicleId) => {
     return AuthService.canCheckOut(vehicleId);
-  };
+  }, []);
 
   const value = {
     // Estado

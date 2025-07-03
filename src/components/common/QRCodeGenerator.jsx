@@ -1,17 +1,118 @@
 import React, { useState, useEffect } from "react";
-import { Container, Card, Row, Col, Badge, Button } from "react-bootstrap";
+import {
+  Container,
+  Card,
+  Row,
+  Col,
+  Badge,
+  Button,
+  Alert,
+  Spinner,
+} from "react-bootstrap";
 import QRCode from "react-qr-code";
-import { FaQrcode, FaPrint, FaCar } from "react-icons/fa";
-import LocalStorageService from "../../services/localStorage";
+import {
+  FaQrcode,
+  FaPrint,
+  FaCar,
+  FaExclamationTriangle,
+} from "react-icons/fa";
+import ApiService from "../../services/api";
+import { toast } from "react-toastify";
 
 function QRCodeGenerator() {
   const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Carregar veículos do localStorage
-    const allVehicles = LocalStorageService.getAllVehicles();
-    setVehicles(allVehicles);
+    loadVehicles();
   }, []);
+
+  const loadVehicles = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await ApiService.getVehicles();
+
+      if (response.vehicles) {
+        setVehicles(response.vehicles);
+      } else {
+        // Se não há dados do backend, criar QR codes de exemplo para demonstração
+        const exampleVehicles = [
+          {
+            id: 1,
+            model: "Ford Transit",
+            plate: "ABC-1234",
+            brand: "Ford",
+            year: 2023,
+            qrCode: "APM_VEHICLE_1",
+            status: "available",
+          },
+          {
+            id: 2,
+            model: "Sprinter",
+            plate: "DEF-5678",
+            brand: "Mercedes-Benz",
+            year: 2022,
+            qrCode: "APM_VEHICLE_2",
+            status: "available",
+          },
+          {
+            id: 3,
+            model: "Daily",
+            plate: "GHI-9012",
+            brand: "Iveco",
+            year: 2023,
+            qrCode: "APM_VEHICLE_3",
+            status: "maintenance",
+          },
+        ];
+        setVehicles(exampleVehicles);
+        setError("Backend desconectado - Usando QR codes de demonstração");
+      }
+    } catch (error) {
+      console.error("Erro ao carregar veículos:", error);
+
+      // Fallback: QR codes de exemplo para demonstração
+      const exampleVehicles = [
+        {
+          id: 1,
+          model: "Ford Transit",
+          plate: "ABC-1234",
+          brand: "Ford",
+          year: 2023,
+          qrCode: "APM_VEHICLE_1",
+          status: "available",
+        },
+        {
+          id: 2,
+          model: "Sprinter",
+          plate: "DEF-5678",
+          brand: "Mercedes-Benz",
+          year: 2022,
+          qrCode: "APM_VEHICLE_2",
+          status: "available",
+        },
+        {
+          id: 3,
+          model: "Daily",
+          plate: "GHI-9012",
+          brand: "Iveco",
+          year: 2023,
+          qrCode: "APM_VEHICLE_3",
+          status: "maintenance",
+        },
+      ];
+      setVehicles(exampleVehicles);
+      setError(
+        "Não foi possível carregar veículos do backend. Usando dados de demonstração."
+      );
+      toast.warning("Usando QR codes de demonstração");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusBadge = (status) => {
     const statusConfig = {
@@ -28,6 +129,17 @@ function QRCodeGenerator() {
     window.print();
   };
 
+  if (loading) {
+    return (
+      <Container>
+        <div className="text-center mt-5">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-3">Carregando QR codes...</p>
+        </div>
+      </Container>
+    );
+  }
+
   return (
     <Container>
       <div className="text-center mb-4">
@@ -35,9 +147,7 @@ function QRCodeGenerator() {
           <FaQrcode className="me-2" />
           QR Codes dos Veículos
         </h2>
-        <p className="text-muted">
-          Para testar o sistema, use estes QR Codes
-        </p>
+        <p className="text-muted">Para testar o sistema, use estes QR Codes</p>
         <Button
           variant="outline-primary"
           size="sm"
@@ -48,6 +158,14 @@ function QRCodeGenerator() {
           Imprimir QR Codes
         </Button>
       </div>
+
+      {/* Alerta de erro/aviso */}
+      {error && (
+        <Alert variant="warning" className="mb-4 d-print-none">
+          <FaExclamationTriangle className="me-2" />
+          {error}
+        </Alert>
+      )}
 
       <Row className="g-4">
         {vehicles.map((vehicle) => (
