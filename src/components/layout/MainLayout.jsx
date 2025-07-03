@@ -152,11 +152,13 @@ function MainLayout({ children }) {
                 {user?.name}
               </div>
               <small className="text-gold-apm" style={{ fontSize: "0.75rem" }}>
-                {user?.role === "admin"
+                {user?.role === "1" || user?.role === "2"
                   ? "Administrador"
-                  : user?.role === "manager"
-                  ? "Gerente"
-                  : "Motorista"}
+                  : user?.role === "3"
+                  ? "Operador"
+                  : user?.role === "4"
+                  ? "Motorista"
+                  : "Usuário"}
               </small>
             </div>
 
