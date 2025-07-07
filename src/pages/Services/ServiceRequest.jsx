@@ -48,12 +48,15 @@ function ServiceRequest() {
     try {
       // Usar fetch direto com a URL correta
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://127.0.0.1:8000/api/veiculos", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        "https://api.controllcar.com.br/api/veiculos",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.ok) {
         const veiculosData = await response.json();
@@ -100,14 +103,17 @@ function ServiceRequest() {
         motorista_id: user.id,
       };
 
-      const response = await fetch("http://127.0.0.1:8000/api/servicos", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(submitData),
-      });
+      const response = await fetch(
+        "https://api.controllcar.com.br/api/servicos",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(submitData),
+        }
+      );
 
       if (response.ok) {
         setSuccess(true);

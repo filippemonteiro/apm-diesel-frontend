@@ -47,7 +47,7 @@ function ServiceHistory() {
         // Carregar veículos
         try {
           const veiculosResponse = await fetch(
-            "http://127.0.0.1:8000/api/veiculos",
+            "https://api.controllcar.com.br/api/veiculos",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -65,7 +65,7 @@ function ServiceHistory() {
         }
 
         // Carregar serviços
-        let url = "http://127.0.0.1:8000/api/servicos";
+        let url = "https://api.controllcar.com.br/api/servicos";
         const params = new URLSearchParams();
 
         // Se não for admin, filtrar apenas serviços do motorista logado
@@ -110,7 +110,7 @@ function ServiceHistory() {
       const token = localStorage.getItem("authToken");
 
       // Construir URL com filtros
-      let url = "http://127.0.0.1:8000/api/servicos";
+      let url = "https://api.controllcar.com.br/api/servicos";
       const params = new URLSearchParams();
 
       // Se não for admin, filtrar apenas serviços do motorista logado
