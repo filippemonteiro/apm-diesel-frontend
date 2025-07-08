@@ -19,6 +19,9 @@ import ServiceRequest from "./pages/Services/ServiceRequest";
 import ServiceHistory from "./pages/Services/ServiceHistory";
 import QRCodeViewer from "./pages/QRCodeViewer/QRCodeViewer";
 
+// Páginas Administrativas
+import VehicleManagement from "./pages/Vehicles/VehicleManagement";
+
 // Componente de rota protegida
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -76,7 +79,7 @@ function PublicRoute({ children }) {
 // Página 404 personalizada
 function NotFound() {
   const { isAuthenticated } = useAuth();
-  
+
   return (
     <div
       className="container-fluid d-flex justify-content-center align-items-center"
@@ -88,8 +91,8 @@ function NotFound() {
         <p className="text-muted mb-4">
           A página que você está procurando não existe ou foi movida.
         </p>
-        <a 
-          href={isAuthenticated ? "/painel" : "/login"} 
+        <a
+          href={isAuthenticated ? "/painel" : "/login"}
           className="btn btn-primary"
         >
           {isAuthenticated ? "Voltar ao Painel" : "Ir para Login"}
@@ -199,6 +202,29 @@ function AppRoutes() {
           <ProtectedRoute>
             <MainLayout>
               <QRCodeViewer />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* CRUD DE VEÍCULOS */}
+      <Route
+        path="/vehicles"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <VehicleManagement />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/veiculos"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <VehicleManagement />
             </MainLayout>
           </ProtectedRoute>
         }
