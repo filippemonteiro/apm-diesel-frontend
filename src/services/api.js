@@ -170,25 +170,6 @@ class ApiService {
     }
   }
 
-  // VEÍCULOS (endpoints futuros)
-  async getVehicles() {
-    try {
-      const response = await api.get("/carros");
-      return response.data;
-    } catch (error) {
-      throw new Error("Erro ao buscar veículos.");
-    }
-  }
-
-  async getVehicleById(id) {
-    try {
-      const response = await api.get(`/carros/${id}`);
-      return response.data;
-    } catch (error) {
-      throw new Error("Veículo não encontrado.");
-    }
-  }
-
   async getVehicleByQrCode(qrCode) {
     try {
       const response = await api.get(`/carros/qr/${qrCode}`);
@@ -244,6 +225,87 @@ class ApiService {
       return response.data;
     } catch (error) {
       throw new Error("Erro ao carregar dados do dashboard.");
+    }
+  }
+
+  // Buscar todos os veículos
+  async getVehicles() {
+    try {
+      const response = await api.get("/veiculos");
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao buscar veículos:", error);
+      throw new Error("Erro ao carregar lista de veículos.");
+    }
+  }
+
+  // Buscar veículo por ID
+  async getVehicleById(id) {
+    try {
+      const response = await api.get(`/veiculos/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao buscar veículo:", error);
+      throw new Error("Veículo não encontrado.");
+    }
+  }
+
+  // Criar novo veículo
+  async createVehicle(vehicleData) {
+    try {
+      const response = await api.post("/veiculos", vehicleData);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao criar veículo:", error);
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error("Erro ao cadastrar veículo.");
+    }
+  }
+
+  // Atualizar veículo existente
+  async updateVehicle(id, vehicleData) {
+    try {
+      const response = await api.put(`/veiculos/${id}`, vehicleData);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao atualizar veículo:", error);
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error("Erro ao atualizar veículo.");
+    }
+  }
+
+  // Deletar veículo
+  async deleteVehicle(id) {
+    try {
+      const response = await api.delete(`/veiculos/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao deletar veículo:", error);
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error("Erro ao excluir veículo.");
+    }
+  }
+
+  // Buscar opções para dropdowns (se disponível)
+  async getVehicleOptions() {
+    try {
+      const response = await api.get("/veiculos/options");
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao buscar opções de veículos:", error);
+      // Retorna dados padrão se a API não estiver disponível
+      return {
+        marcas: ["Ford", "Mercedes-Benz", "Iveco", "Volkswagen", "Renault"],
+        tipos: ["Van", "Caminhão", "Ônibus", "Carro", "Utilitário"],
+        combustiveis: ["Gasolina", "Diesel", "Flex", "Elétrico"],
+        status: ["Disponível", "Em uso", "Manutenção", "Indisponível"],
+      };
     }
   }
 }
