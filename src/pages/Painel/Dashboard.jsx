@@ -15,9 +15,6 @@ import {
   FaChartLine,
   FaCogs,
   FaQrcode,
-  FaGasPump,
-  FaWrench,
-  FaClipboardList,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import ApiService from "../../services/api";
@@ -89,7 +86,7 @@ function Dashboard() {
     );
   };
 
-  // Função para navegação com animação
+  // Função para navegação
   const handleNavigation = (path) => {
     navigate(path);
   };
@@ -107,408 +104,320 @@ function Dashboard() {
 
   return (
     <Container className="mt-4">
-      {/* Cabeçalho */}
-      <Row className="mb-4">
+      {/* Cabeçalho Compacto */}
+      <Row className="mb-3">
         <Col>
-          <div className="d-flex justify-content-between align-items-center">
-            <div>
-              <h2 className="text-primary-apm fw-bold mb-1">Dashboard</h2>
-              <p className="text-muted mb-0">
-                Bem-vindo, {user?.name || "Usuário"}! Aqui está um resumo do
-                sistema.
-              </p>
-            </div>
-            <div className="text-end d-none d-md-block">
-              <small className="text-muted">
-                Última atualização: {new Date().toLocaleString("pt-BR")}
-              </small>
-            </div>
+          <div className="text-center text-md-start">
+            <h2 className="text-primary-apm fw-bold mb-1">Dashboard</h2>
+            <p className="text-muted mb-0 small">
+              Olá, {user?.name || "Usuário"}! Resumo do sistema:
+            </p>
           </div>
         </Col>
       </Row>
 
-      {/* Alerta de erro */}
+      {/* Alerta de erro - Compacto */}
       {error && (
-        <Alert variant="warning" className="mb-4">
+        <Alert variant="warning" className="mb-3 py-2">
           <div className="d-flex align-items-center">
-            <div className="me-3">⚠️</div>
-            <div>
-              <Alert.Heading className="h6 mb-1">
-                Sistema com limitações
-              </Alert.Heading>
-              <p className="mb-0">{error}</p>
-            </div>
+            <div className="me-2">⚠️</div>
+            <small>{error}</small>
           </div>
         </Alert>
       )}
 
-      {/* Cards de Estatísticas */}
-      <Row className="g-4 mb-4">
-        {/* Total de Veículos */}
-        <Col xl={3} lg={6} md={6}>
-          <Card className="h-100 border-0 shadow-sm">
-            <Card.Body className="d-flex align-items-center">
-              <div className="bg-primary text-white rounded-circle p-3 me-3">
-                <FaCar size={24} />
+      {/* Cards de Estatísticas - LAYOUT OTIMIZADO PARA MOBILE */}
+      <Row className="g-3 mb-4">
+        {/* Total e Disponíveis - Primeira linha mobile */}
+        <Col xs={6} md={3}>
+          <Card className="border-0 shadow-sm h-100">
+            <Card.Body className="p-3 text-center">
+              <div
+                className="bg-primary text-white rounded-circle p-2 mb-2 mx-auto"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <FaCar size={16} />
+              </div>
+              <h4 className="mb-0 fw-bold" style={{ fontSize: "1.25rem" }}>
+                {stats.totalVehicles}
+              </h4>
+              <small className="text-muted">Total Veículos</small>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        <Col xs={6} md={3}>
+          <Card className="border-0 shadow-sm h-100">
+            <Card.Body className="p-3 text-center">
+              <div
+                className="bg-success text-white rounded-circle p-2 mb-2 mx-auto"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <FaCar size={16} />
+              </div>
+              <h4 className="mb-0 fw-bold" style={{ fontSize: "1.25rem" }}>
+                {stats.availableVehicles}
+              </h4>
+              <small className="text-muted">Disponíveis</small>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        {/* Em Uso e Manutenção - Segunda linha mobile */}
+        <Col xs={6} md={3}>
+          <Card className="border-0 shadow-sm h-100">
+            <Card.Body className="p-3 text-center">
+              <div
+                className="bg-warning text-white rounded-circle p-2 mb-2 mx-auto"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <FaCar size={16} />
+              </div>
+              <h4 className="mb-0 fw-bold" style={{ fontSize: "1.25rem" }}>
+                {stats.inUseVehicles}
+              </h4>
+              <small className="text-muted">Em Uso</small>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        <Col xs={6} md={3}>
+          <Card className="border-0 shadow-sm h-100">
+            <Card.Body className="p-3 text-center">
+              <div
+                className="bg-danger text-white rounded-circle p-2 mb-2 mx-auto"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <FaTools size={16} />
+              </div>
+              <h4 className="mb-0 fw-bold" style={{ fontSize: "1.25rem" }}>
+                {stats.maintenanceVehicles}
+              </h4>
+              <small className="text-muted">Manutenção</small>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Estatísticas Secundárias - Compactas */}
+      <Row className="g-3 mb-4">
+        <Col xs={6} md={6}>
+          <Card className="border-0 shadow-sm h-100">
+            <Card.Body className="p-3 d-flex align-items-center">
+              <div
+                className="bg-info text-white rounded-circle p-2 me-3"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <FaUsers size={16} />
               </div>
               <div>
-                <h4 className="mb-0 fw-bold">{stats.totalVehicles}</h4>
-                <small className="text-muted">Total de Veículos</small>
+                <h5 className="mb-0 fw-bold">{stats.totalUsers}</h5>
+                <small className="text-muted">Usuários</small>
               </div>
             </Card.Body>
           </Card>
         </Col>
 
-        {/* Veículos Disponíveis */}
-        <Col xl={3} lg={6} md={6}>
-          <Card className="h-100 border-0 shadow-sm">
-            <Card.Body className="d-flex align-items-center">
-              <div className="bg-success text-white rounded-circle p-3 me-3">
-                <FaCar size={24} />
+        <Col xs={6} md={6}>
+          <Card className="border-0 shadow-sm h-100">
+            <Card.Body className="p-3 d-flex align-items-center">
+              <div
+                className="bg-secondary text-white rounded-circle p-2 me-3"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <FaChartLine size={16} />
               </div>
               <div>
-                <h4 className="mb-0 fw-bold">{stats.availableVehicles}</h4>
-                <small className="text-muted">Disponíveis</small>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        {/* Veículos em Uso */}
-        <Col xl={3} lg={6} md={6}>
-          <Card className="h-100 border-0 shadow-sm">
-            <Card.Body className="d-flex align-items-center">
-              <div className="bg-warning text-white rounded-circle p-3 me-3">
-                <FaCar size={24} />
-              </div>
-              <div>
-                <h4 className="mb-0 fw-bold">{stats.inUseVehicles}</h4>
-                <small className="text-muted">Em Uso</small>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        {/* Veículos em Manutenção */}
-        <Col xl={3} lg={6} md={6}>
-          <Card className="h-100 border-0 shadow-sm">
-            <Card.Body className="d-flex align-items-center">
-              <div className="bg-danger text-white rounded-circle p-3 me-3">
-                <FaTools size={24} />
-              </div>
-              <div>
-                <h4 className="mb-0 fw-bold">{stats.maintenanceVehicles}</h4>
-                <small className="text-muted">Em Manutenção</small>
+                <h5 className="mb-0 fw-bold">{stats.pendingRequests}</h5>
+                <small className="text-muted">Chamados</small>
               </div>
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
-      {/* Segunda linha de estatísticas */}
-      <Row className="g-4 mb-5">
-        {/* Total de Usuários */}
-        <Col md={6}>
-          <Card className="h-100 border-0 shadow-sm">
-            <Card.Body className="d-flex align-items-center">
-              <div className="bg-info text-white rounded-circle p-3 me-3">
-                <FaUsers size={24} />
-              </div>
-              <div>
-                <h4 className="mb-0 fw-bold">{stats.totalUsers}</h4>
-                <small className="text-muted">Usuários Cadastrados</small>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        {/* Chamados Pendentes */}
-        <Col md={6}>
-          <Card className="h-100 border-0 shadow-sm">
-            <Card.Body className="d-flex align-items-center">
-              <div className="bg-secondary text-white rounded-circle p-3 me-3">
-                <FaChartLine size={24} />
-              </div>
-              <div>
-                <h4 className="mb-0 fw-bold">{stats.pendingRequests}</h4>
-                <small className="text-muted">Chamados Pendentes</small>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Ações Principais - Para todos os usuários */}
-      <Row className="mb-4">
-        <Col>
-          <h5 className="text-primary-apm fw-bold mb-3">
-            <FaTools className="me-2" />
-            Ações Principais
-          </h5>
-        </Col>
-      </Row>
-
-      <Row className="g-4 mb-5">
-        {/* Check-in */}
-        <Col lg={3} md={6}>
-          <Card
-            className="h-100 shadow-sm cursor-pointer border-success"
-            onClick={() => handleNavigation("/checkin")}
-            style={{
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-3px)";
-              e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,0.15)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "";
-            }}
-          >
-            <Card.Body className="text-center">
-              <div
-                className="bg-success text-white rounded-circle p-3 mb-3 mx-auto"
-                style={{ width: "fit-content" }}
-              >
-                <FaCar size={24} />
-              </div>
-              <Card.Title className="h6">Check-in</Card.Title>
-              <Card.Text className="text-muted small">
-                Iniciar uso de veículo
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        {/* Check-out */}
-        <Col lg={3} md={6}>
-          <Card
-            className="h-100 shadow-sm cursor-pointer border-warning"
-            onClick={() => handleNavigation("/checkout")}
-            style={{
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-3px)";
-              e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,0.15)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "";
-            }}
-          >
-            <Card.Body className="text-center">
-              <div
-                className="bg-warning text-white rounded-circle p-3 mb-3 mx-auto"
-                style={{ width: "fit-content" }}
-              >
-                <FaCar size={24} />
-              </div>
-              <Card.Title className="h6">Check-out</Card.Title>
-              <Card.Text className="text-muted small">
-                Finalizar uso de veículo
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        {/* Solicitação de Serviços */}
-        <Col lg={3} md={6}>
-          <Card
-            className="h-100 shadow-sm cursor-pointer border-primary"
-            onClick={() => handleNavigation("/service-request")}
-            style={{
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-3px)";
-              e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,0.15)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "";
-            }}
-          >
-            <Card.Body className="text-center">
-              <div
-                className="bg-primary text-white rounded-circle p-3 mb-3 mx-auto"
-                style={{ width: "fit-content" }}
-              >
-                <FaGasPump size={24} />
-              </div>
-              <Card.Title className="h6">Solicitar Serviços</Card.Title>
-              <Card.Text className="text-muted small">
-                Combustível e manutenção
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        {/* Histórico */}
-        <Col lg={3} md={6}>
-          <Card
-            className="h-100 shadow-sm cursor-pointer border-info"
-            onClick={() => handleNavigation("/service-history")}
-            style={{
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-3px)";
-              e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,0.15)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "";
-            }}
-          >
-            <Card.Body className="text-center">
-              <div
-                className="bg-info text-white rounded-circle p-3 mb-3 mx-auto"
-                style={{ width: "fit-content" }}
-              >
-                <FaClipboardList size={24} />
-              </div>
-              <Card.Title className="h6">Histórico</Card.Title>
-              <Card.Text className="text-muted small">
-                Ver relatórios e histórico
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Seção Administrativa - Apenas para Admin/Manager */}
+      {/* Seção Administrativa - APENAS FUNCIONALIDADES ÚNICAS */}
       {isAdminOrManager() && (
         <>
-          <Row className="mb-4">
+          <Row className="mb-3">
             <Col>
-              <h5 className="text-primary-apm fw-bold mb-3">
-                <FaCogs className="me-2" />
-                Administração
-                <Badge bg="warning" className="ms-2">
+              <div className="d-flex align-items-center justify-content-between">
+                <div>
+                  <h5 className="text-primary-apm fw-bold mb-1">
+                    <FaCogs className="me-2" />
+                    Administração
+                  </h5>
+                  <p className="text-muted mb-0 small">
+                    Funcionalidades exclusivas para gestores
+                  </p>
+                </div>
+                <Badge bg="warning" className="d-none d-md-inline">
                   Admin
                 </Badge>
-              </h5>
-              <p className="text-muted mb-0">
-                Ferramentas de gestão disponíveis apenas para administradores
-              </p>
+              </div>
             </Col>
           </Row>
 
-          <Row className="g-4 mb-5">
+          <Row className="g-3 mb-4">
             {/* Gerenciar Veículos */}
-            <Col lg={4} md={6}>
+            <Col xs={12} sm={6} lg={4}>
               <Card
-                className="h-100 shadow-sm cursor-pointer"
+                className="shadow-sm cursor-pointer h-100"
                 onClick={() => handleNavigation("/vehicles")}
                 style={{
                   cursor: "pointer",
                   transition: "all 0.3s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-3px)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
                   e.currentTarget.style.boxShadow =
-                    "0 6px 20px rgba(0,0,0,0.15)";
+                    "0 4px 12px rgba(0,0,0,0.15)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "translateY(0)";
                   e.currentTarget.style.boxShadow = "";
                 }}
               >
-                <Card.Body className="text-center">
+                <Card.Body className="text-center p-4">
                   <div
                     className="bg-primary text-white rounded-circle p-3 mb-3 mx-auto"
-                    style={{ width: "fit-content" }}
+                    style={{
+                      width: "60px",
+                      height: "60px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
                   >
-                    <FaCar size={28} />
+                    <FaCar size={24} />
                   </div>
-                  <Card.Title className="h5">Gerenciar Veículos</Card.Title>
-                  <Card.Text className="text-muted">
-                    Cadastrar, editar e gerenciar toda a frota de veículos da
-                    empresa
+                  <Card.Title className="h6 mb-2">
+                    Gerenciar Veículos
+                  </Card.Title>
+                  <Card.Text className="text-muted small mb-3">
+                    CRUD completo da frota
                   </Card.Text>
-                  <div className="mt-auto">
-                    <Badge bg="primary">Disponível</Badge>
-                  </div>
+                  <Badge bg="primary">Disponível</Badge>
                 </Card.Body>
               </Card>
             </Col>
 
             {/* Gerenciar Usuários */}
-            <Col lg={4} md={6}>
+            <Col xs={12} sm={6} lg={4}>
               <Card
-                className="h-100 shadow-sm cursor-pointer"
+                className="shadow-sm cursor-pointer h-100"
                 onClick={() => handleNavigation("/users")}
                 style={{
                   cursor: "pointer",
                   transition: "all 0.3s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-3px)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
                   e.currentTarget.style.boxShadow =
-                    "0 6px 20px rgba(0,0,0,0.15)";
+                    "0 4px 12px rgba(0,0,0,0.15)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "translateY(0)";
                   e.currentTarget.style.boxShadow = "";
                 }}
               >
-                <Card.Body className="text-center">
+                <Card.Body className="text-center p-4">
                   <div
                     className="bg-info text-white rounded-circle p-3 mb-3 mx-auto"
-                    style={{ width: "fit-content" }}
+                    style={{
+                      width: "60px",
+                      height: "60px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
                   >
-                    <FaUsers size={28} />
+                    <FaUsers size={24} />
                   </div>
-                  <Card.Title className="h5">Gerenciar Usuários</Card.Title>
-                  <Card.Text className="text-muted">
-                    Cadastrar e gerenciar usuários e permissões do sistema
+                  <Card.Title className="h6 mb-2">
+                    Gerenciar Usuários
+                  </Card.Title>
+                  <Card.Text className="text-muted small mb-3">
+                    CRUD de usuários e permissões
                   </Card.Text>
-                  <div className="mt-auto">
-                    <Badge bg="primary">Disponível</Badge>
-                  </div>
+                  <Badge bg="primary">Disponível</Badge>
                 </Card.Body>
               </Card>
             </Col>
 
-            {/* QR Codes */}
-            <Col lg={4} md={6}>
+            {/* QR Codes - Mantido pois é específico para admin */}
+            <Col xs={12} sm={6} lg={4}>
               <Card
-                className="h-100 shadow-sm cursor-pointer"
+                className="shadow-sm cursor-pointer h-100"
                 onClick={() => handleNavigation("/qr-codes")}
                 style={{
                   cursor: "pointer",
                   transition: "all 0.3s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-3px)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
                   e.currentTarget.style.boxShadow =
-                    "0 6px 20px rgba(0,0,0,0.15)";
+                    "0 4px 12px rgba(0,0,0,0.15)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "translateY(0)";
                   e.currentTarget.style.boxShadow = "";
                 }}
               >
-                <Card.Body className="text-center">
+                <Card.Body className="text-center p-4">
                   <div
                     className="bg-dark text-white rounded-circle p-3 mb-3 mx-auto"
-                    style={{ width: "fit-content" }}
+                    style={{
+                      width: "60px",
+                      height: "60px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
                   >
-                    <FaQrcode size={28} />
+                    <FaQrcode size={24} />
                   </div>
-                  <Card.Title className="h5">QR Codes</Card.Title>
-                  <Card.Text className="text-muted">
-                    Visualizar e gerenciar códigos QR dos veículos
+                  <Card.Title className="h6 mb-2">QR Codes</Card.Title>
+                  <Card.Text className="text-muted small mb-3">
+                    Códigos QR dos veículos
                   </Card.Text>
-                  <div className="mt-auto">
-                    <Badge bg="dark">Disponível</Badge>
-                  </div>
+                  <Badge bg="dark">Disponível</Badge>
                 </Card.Body>
               </Card>
             </Col>
@@ -516,22 +425,22 @@ function Dashboard() {
         </>
       )}
 
-      {/* Status do Sistema */}
+      {/* Status do Sistema - Compacto */}
       <Row>
         <Col>
           <Card className="border-0 shadow-sm">
-            <Card.Body>
+            <Card.Body className="py-2 px-3">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <h6 className="text-primary-apm mb-1">Status do Sistema</h6>
-                  <p className="text-muted mb-0">
-                    {error
-                      ? "🔴 Backend desconectado - Funcionalidades limitadas"
-                      : "🟢 Sistema operacional - Todos os serviços funcionando"}
-                  </p>
+                  <small className="text-primary-apm fw-semibold">
+                    Status do Sistema
+                  </small>
+                  <div className="text-muted" style={{ fontSize: "0.8rem" }}>
+                    {error ? "🔴 Limitado" : "🟢 Operacional"}
+                  </div>
                 </div>
                 <div className="text-end d-none d-md-block">
-                  <small className="text-muted">
+                  <small className="text-muted" style={{ fontSize: "0.75rem" }}>
                     {new Date().toLocaleString("pt-BR")}
                   </small>
                 </div>
