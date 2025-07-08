@@ -308,6 +308,105 @@ class ApiService {
       };
     }
   }
+  
+  // Buscar todos os usuários
+  async getUsers() {
+    try {
+      const response = await api.get("/usuarios");
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao buscar usuários:", error);
+      throw new Error("Erro ao carregar lista de usuários.");
+    }
+  }
+
+  // Buscar usuário por ID
+  async getUserById(id) {
+    try {
+      const response = await api.get(`/usuarios/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao buscar usuário:", error);
+      throw new Error("Usuário não encontrado.");
+    }
+  }
+
+  // Criar novo usuário
+  async createUser(userData) {
+    try {
+      const response = await api.post("/usuarios", userData);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao criar usuário:", error);
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      if (error.response?.data?.errors) {
+        // Tratar erros de validação do Laravel
+        const errors = error.response.data.errors;
+        const firstError = Object.values(errors)[0][0];
+        throw new Error(firstError);
+      }
+      throw new Error("Erro ao cadastrar usuário.");
+    }
+  }
+
+  // Atualizar usuário existente
+  async updateUser(id, userData) {
+    try {
+      const response = await api.put(`/usuarios/${id}`, userData);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao atualizar usuário:", error);
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      if (error.response?.data?.errors) {
+        // Tratar erros de validação do Laravel
+        const errors = error.response.data.errors;
+        const firstError = Object.values(errors)[0][0];
+        throw new Error(firstError);
+      }
+      throw new Error("Erro ao atualizar usuário.");
+    }
+  }
+
+  // Deletar usuário
+  async deleteUser(id) {
+    try {
+      const response = await api.delete(`/usuarios/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao deletar usuário:", error);
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error("Erro ao excluir usuário.");
+    }
+  }
+
+  // Buscar opções para dropdowns (se disponível)
+  async getUserOptions() {
+    try {
+      const response = await api.get("/users/options");
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao buscar opções de usuários:", error);
+      // Retorna dados padrão se a API não estiver disponível
+      return {
+        roles: [
+          { value: "1", label: "Super Admin" },
+          { value: "2", label: "Admin" },
+          { value: "3", label: "Operador" },
+          { value: "4", label: "Motorista" }
+        ],
+        status: [
+          { value: "1", label: "Ativo" },
+          { value: "0", label: "Inativo" }
+        ]
+      };
+    }
+  }
 }
 
 // Exportar instância única do serviço
