@@ -199,7 +199,7 @@ class AuthService {
     }
   }
 
-  // Verificar se usuário está autenticado
+  // Verificar se usuário está autenticado (CORRIGIDO PARA SANCTUM)
   isAuthenticated() {
     const user = LocalStorageService.getCurrentUser();
     const token = LocalStorageService.getAuthToken();
@@ -210,30 +210,9 @@ class AuthService {
       userName: user?.name,
     });
 
-    if (!user || !token) {
-      return false;
-    }
-
-    // Verificar se token não expirou (simulação)
-    try {
-      const tokenData = JSON.parse(atob(token));
-      const isTokenValid = Date.now() < tokenData.exp;
-
-      console.log("🔑 Token check:", {
-        isValid: isTokenValid,
-        expires: new Date(tokenData.exp).toLocaleString(),
-      });
-
-      if (!isTokenValid) {
-        console.log("⏰ Token expirado, fazendo logout automático");
-        this.logout();
-        return false;
-      }
-      return true;
-    } catch (error) {
-      console.error("❌ Erro ao verificar token:", error);
-      return false;
-    }
+    // Para tokens do Laravel Sanctum, apenas verificamos se existem user e token
+    // A API do backend já controla a validade do token automaticamente
+    return !!(user && token);
   }
 
   // Obter usuário atual
