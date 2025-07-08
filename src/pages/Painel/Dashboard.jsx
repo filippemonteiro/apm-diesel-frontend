@@ -470,7 +470,7 @@ function Dashboard() {
                     Cadastrar e gerenciar usuários e permissões do sistema
                   </Card.Text>
                   <div className="mt-auto">
-                    <Badge bg="warning">Aguardando Backend</Badge>
+                    <Badge bg="primary">Disponível</Badge>
                   </div>
                 </Card.Body>
               </Card>
