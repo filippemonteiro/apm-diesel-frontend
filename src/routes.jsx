@@ -21,6 +21,7 @@ import QRCodeViewer from "./pages/QRCodeViewer/QRCodeViewer";
 
 // Páginas Administrativas
 import VehicleManagement from "./pages/Vehicles/VehicleManagement";
+import UserManagement from "./pages/Users/UserManagement";
 
 // Componente de rota protegida
 function ProtectedRoute({ children }) {
@@ -225,6 +226,29 @@ function AppRoutes() {
           <ProtectedRoute>
             <MainLayout>
               <VehicleManagement />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* CRUD DE USUÁRIOS */}
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <UserManagement />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/usuarios"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <UserManagement />
             </MainLayout>
           </ProtectedRoute>
         }
