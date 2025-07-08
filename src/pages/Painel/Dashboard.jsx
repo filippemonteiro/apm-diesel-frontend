@@ -439,18 +439,28 @@ function Dashboard() {
               </Card>
             </Col>
 
-            {/* Gerenciar Usuários - Em breve */}
+            {/* Gerenciar Usuários */}
             <Col lg={4} md={6}>
               <Card
-                className="h-100 shadow-sm"
+                className="h-100 shadow-sm cursor-pointer"
+                onClick={() => handleNavigation("/users")}
                 style={{
-                  opacity: 0.7,
-                  cursor: "not-allowed",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-3px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 6px 20px rgba(0,0,0,0.15)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "";
                 }}
               >
                 <Card.Body className="text-center">
                   <div
-                    className="bg-secondary text-white rounded-circle p-3 mb-3 mx-auto"
+                    className="bg-info text-white rounded-circle p-3 mb-3 mx-auto"
                     style={{ width: "fit-content" }}
                   >
                     <FaUsers size={28} />
@@ -460,7 +470,7 @@ function Dashboard() {
                     Cadastrar e gerenciar usuários e permissões do sistema
                   </Card.Text>
                   <div className="mt-auto">
-                    <Badge bg="secondary">Em Breve</Badge>
+                    <Badge bg="warning">Aguardando Backend</Badge>
                   </div>
                 </Card.Body>
               </Card>
