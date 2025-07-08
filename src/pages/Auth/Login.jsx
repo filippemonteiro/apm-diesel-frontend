@@ -219,28 +219,39 @@ function Login() {
               isInvalid={!!errors.password}
               disabled={isSubmitting || isLoading}
               autoComplete="current-password"
+              className="pe-5"
               style={{
                 fontSize: "0.95rem",
-                padding: "12px 45px 12px 14px",
+                padding: "12px 14px",
                 border: "2px solid var(--border-light)",
                 borderRadius: "10px",
                 transition: "all 0.3s ease",
               }}
             />
-            <Button
-              variant="link"
-              className="position-absolute end-0 top-50 translate-middle-y border-0"
+            <button
+              type="button"
+              className="btn btn-link position-absolute p-0 border-0"
               style={{
-                zIndex: 10,
-                padding: "6px 10px",
+                top: "50%",
+                right: "12px",
+                transform: "translateY(-50%)",
+                zIndex: 1000,
+                width: "24px",
+                height: "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 color: "var(--text-muted)",
+                backgroundColor: "transparent",
+                outline: "none",
+                boxShadow: "none",
               }}
               onClick={() => setShowPassword(!showPassword)}
               disabled={isSubmitting || isLoading}
               aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
             >
-              {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
-            </Button>
+              {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+            </button>
           </div>
           <Form.Control.Feedback type="invalid" style={{ fontSize: "0.8rem" }}>
             {errors.password}

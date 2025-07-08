@@ -209,7 +209,7 @@ function SignUp() {
           </Form.Text>
         </Form.Group>
 
-        {/* Senhas lado a lado no desktop - SEÇÃO CORRIGIDA */}
+        {/* Senhas */}
         <Row className="g-3 mb-3 password-row">
           <Col md={6}>
             <Form.Group>
@@ -227,19 +227,36 @@ function SignUp() {
                   isInvalid={!!errors.password}
                   disabled={isSubmitting || isLoading}
                   autoComplete="new-password"
-                  style={{
-                    paddingRight: "45px", // Espaço para o botão de mostrar/ocultar
-                  }}
+                  className="pe-5" // ← BOOTSTRAP CLASS para padding-right
                 />
-                <Button
-                  variant="link"
-                  className="position-absolute end-0 top-50 translate-middle-y border-0 text-muted password-toggle-btn"
+                <button
+                  type="button"
+                  className="btn btn-link position-absolute p-0 border-0"
+                  style={{
+                    top: "50%",
+                    right: "12px",
+                    transform: "translateY(-50%)",
+                    zIndex: 1000,
+                    width: "24px",
+                    height: "24px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "var(--text-muted)",
+                    backgroundColor: "transparent",
+                    outline: "none",
+                    boxShadow: "none",
+                  }}
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isSubmitting || isLoading}
                   aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                 >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </Button>
+                  {showPassword ? (
+                    <FaEyeSlash size={14} />
+                  ) : (
+                    <FaEye size={14} />
+                  )}
+                </button>
               </div>
               <Form.Control.Feedback type="invalid">
                 {errors.password}
@@ -263,21 +280,38 @@ function SignUp() {
                   isInvalid={!!errors.confirmPassword}
                   disabled={isSubmitting || isLoading}
                   autoComplete="new-password"
-                  style={{
-                    paddingRight: "45px", // Espaço para o botão de mostrar/ocultar
-                  }}
+                  className="pe-5"
                 />
-                <Button
-                  variant="link"
-                  className="position-absolute end-0 top-50 translate-middle-y border-0 text-muted password-toggle-btn"
+                <button
+                  type="button"
+                  className="btn btn-link position-absolute p-0 border-0"
+                  style={{
+                    top: "50%",
+                    right: "12px",
+                    transform: "translateY(-50%)",
+                    zIndex: 1000,
+                    width: "24px",
+                    height: "24px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "var(--text-muted)",
+                    backgroundColor: "transparent",
+                    outline: "none",
+                    boxShadow: "none",
+                  }}
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   disabled={isSubmitting || isLoading}
                   aria-label={
                     showConfirmPassword ? "Ocultar senha" : "Mostrar senha"
                   }
                 >
-                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                </Button>
+                  {showConfirmPassword ? (
+                    <FaEyeSlash size={14} />
+                  ) : (
+                    <FaEye size={14} />
+                  )}
+                </button>
               </div>
               <Form.Control.Feedback type="invalid">
                 {errors.confirmPassword}
