@@ -331,9 +331,9 @@ function Dashboard() {
                     Gerenciar Veículos
                   </Card.Title>
                   <Card.Text className="text-muted small mb-3">
-                    CRUD completo da frota
+                    Adicione, remova e atualize os dados dos veículos.
                   </Card.Text>
-                  <Badge bg="primary">Disponível</Badge>
+                  <Badge bg="primary">Acessar</Badge>
                 </Card.Body>
               </Card>
             </Col>
@@ -374,9 +374,9 @@ function Dashboard() {
                     Gerenciar Usuários
                   </Card.Title>
                   <Card.Text className="text-muted small mb-3">
-                    CRUD de usuários e permissões
+                    Adicione, remova e edite os perfis de usuário.
                   </Card.Text>
-                  <Badge bg="primary">Disponível</Badge>
+                  <Badge bg="primary">Acessar</Badge>
                 </Card.Body>
               </Card>
             </Col>
@@ -417,7 +417,7 @@ function Dashboard() {
                   <Card.Text className="text-muted small mb-3">
                     Códigos QR dos veículos
                   </Card.Text>
-                  <Badge bg="dark">Disponível</Badge>
+                  <Badge bg="dark">Acessar</Badge>
                 </Card.Body>
               </Card>
             </Col>
