@@ -108,9 +108,9 @@ function Dashboard() {
       <Row className="mb-3">
         <Col>
           <div className="text-center text-md-start">
-            <h2 className="text-primary-apm fw-bold mb-1">Dashboard</h2>
+            <h2 className="text-primary-apm fw-bold mb-1">Painel</h2>
             <p className="text-muted mb-0 small">
-              Olá, {user?.name || "Usuário"}! Resumo do sistema:
+              Olá, {user?.name || "Usuário"}! Este é o resumo atual do sistema:
             </p>
           </div>
         </Col>
