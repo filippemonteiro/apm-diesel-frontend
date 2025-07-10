@@ -271,28 +271,26 @@ function VehicleManagement() {
             </div>
 
             {/* Action Buttons */}
-            <div className="d-flex gap-2 pt-2 border-top">
+            <div className="d-flex gap-2 pt-3 border-top">
               <Button
                 variant="outline-primary"
                 size="sm"
+                className="flex-fill"
                 onClick={() => handleEditVehicle(vehicle)}
                 title="Editar veículo"
-                className="flex-fill d-flex align-items-center justify-content-center"
-                style={{ minHeight: "36px" }}
               >
-                <FaEdit className="me-1" size={14} />
-                <span>Editar</span>
+                <FaEdit className="me-1" />
+                Editar
               </Button>
               <Button
                 variant="outline-danger"
                 size="sm"
+                className="flex-fill"
                 onClick={() => handleDeleteConfirm(vehicle)}
                 title="Excluir veículo"
-                className="flex-fill d-flex align-items-center justify-content-center"
-                style={{ minHeight: "36px" }}
               >
-                <FaTrash className="me-1" size={14} />
-                <span>Excluir</span>
+                <FaTrash className="me-1" />
+                Excluir
               </Button>
             </div>
           </Card.Body>

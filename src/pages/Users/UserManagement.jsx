@@ -293,38 +293,32 @@ function UserManagement() {
       {filteredUsers.map((userItem) => (
         <Card key={userItem.id} className="mb-3 shadow-sm border-0">
           <Card.Body className="p-4">
-            {/* Header - Nome e Status */}
-            <div className="d-flex justify-content-between align-items-start mb-3">
-              <div className="flex-grow-1 me-3">
-                <div className="d-flex align-items-center mb-2">
-                  <h6 className="mb-0 fw-bold text-dark">
-                    {userItem.name}
-                  </h6>
-                  {userItem.id === user.id && (
-                    <Badge 
-                      bg="info" 
-                      className="ms-2 px-2 py-1" 
-                      style={{ fontSize: "0.65rem" }}
-                    >
-                      Você
-                    </Badge>
-                  )}
-                </div>
-                <small className="text-muted d-block mb-0" style={{ fontSize: "0.85rem" }}>
-                  {userItem.email}
-                </small>
-              </div>
-              <div className="text-end">
-                {renderStatusBadge(userItem.ativo)}
-              </div>
+            {/* Header - Nome e Email */}
+            <div className="mb-3">
+              <h6 className="mb-2 fw-bold text-dark d-flex align-items-center">
+                {userItem.name}
+                {userItem.id === user.id && (
+                  <Badge
+                    bg="info"
+                    className="ms-2 px-2 py-1"
+                    style={{ fontSize: "0.6rem" }}
+                  >
+                    Você
+                  </Badge>
+                )}
+              </h6>
+              <small
+                className="text-muted d-block"
+                style={{ fontSize: "0.85rem" }}
+              >
+                {userItem.email}
+              </small>
             </div>
 
-            {/* Info Row - Função e Data */}
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <div className="d-flex flex-column">
-                <div className="mb-2">
-                  {renderRoleBadge(userItem.role)}
-                </div>
+            {/* Status e Função */}
+            <div className="d-flex justify-content-between align-items-start mb-3">
+              <div className="d-flex flex-column flex-grow-1">
+                <div className="mb-2">{renderRoleBadge(userItem.role)}</div>
                 <small className="text-muted" style={{ fontSize: "0.8rem" }}>
                   Cadastrado em{" "}
                   {userItem.created_at
@@ -332,32 +326,31 @@ function UserManagement() {
                     : "-"}
                 </small>
               </div>
+              <div className="ms-3">{renderStatusBadge(userItem.ativo)}</div>
             </div>
 
             {/* Action Buttons */}
-            <div className="d-flex gap-2 pt-2 border-top">
+            <div className="d-flex gap-2 pt-3 border-top">
               <Button
                 variant="outline-primary"
                 size="sm"
+                className="flex-fill"
                 onClick={() => handleEditUser(userItem)}
                 title="Editar usuário"
-                className="flex-fill d-flex align-items-center justify-content-center"
-                style={{ minHeight: "36px" }}
               >
-                <FaEdit className="me-1" size={14} />
-                <span>Editar</span>
+                <FaEdit className="me-1" />
+                Editar
               </Button>
               <Button
                 variant="outline-danger"
                 size="sm"
+                className="flex-fill"
                 onClick={() => handleDeleteConfirm(userItem)}
                 title="Excluir usuário"
                 disabled={userItem.id === user.id}
-                className="flex-fill d-flex align-items-center justify-content-center"
-                style={{ minHeight: "36px" }}
               >
-                <FaTrash className="me-1" size={14} />
-                <span>Excluir</span>
+                <FaTrash className="me-1" />
+                Excluir
               </Button>
             </div>
           </Card.Body>
