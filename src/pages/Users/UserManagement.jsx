@@ -12,6 +12,7 @@ import {
   Modal,
   Form,
   InputGroup,
+  ButtonGroup,
 } from "react-bootstrap";
 import {
   FaUsers,
@@ -286,6 +287,146 @@ function UserManagement() {
     );
   };
 
+  // Renderizar layout mobile (Cards) - VERSÃO APRIMORADA
+  const renderMobileLayout = () => (
+    <div className="d-block d-md-none">
+      {filteredUsers.map((userItem) => (
+        <Card key={userItem.id} className="mb-3 shadow-sm border-0">
+          <Card.Body className="p-4">
+            {/* Header - Nome e Status */}
+            <div className="d-flex justify-content-between align-items-start mb-3">
+              <div className="flex-grow-1 me-3">
+                <div className="d-flex align-items-center mb-2">
+                  <h6 className="mb-0 fw-bold text-dark">
+                    {userItem.name}
+                  </h6>
+                  {userItem.id === user.id && (
+                    <Badge 
+                      bg="info" 
+                      className="ms-2 px-2 py-1" 
+                      style={{ fontSize: "0.65rem" }}
+                    >
+                      Você
+                    </Badge>
+                  )}
+                </div>
+                <small className="text-muted d-block mb-0" style={{ fontSize: "0.85rem" }}>
+                  {userItem.email}
+                </small>
+              </div>
+              <div className="text-end">
+                {renderStatusBadge(userItem.ativo)}
+              </div>
+            </div>
+
+            {/* Info Row - Função e Data */}
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <div className="d-flex flex-column">
+                <div className="mb-2">
+                  {renderRoleBadge(userItem.role)}
+                </div>
+                <small className="text-muted" style={{ fontSize: "0.8rem" }}>
+                  Cadastrado em{" "}
+                  {userItem.created_at
+                    ? new Date(userItem.created_at).toLocaleDateString("pt-BR")
+                    : "-"}
+                </small>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="d-flex gap-2 pt-2 border-top">
+              <Button
+                variant="outline-primary"
+                size="sm"
+                onClick={() => handleEditUser(userItem)}
+                title="Editar usuário"
+                className="flex-fill d-flex align-items-center justify-content-center"
+                style={{ minHeight: "36px" }}
+              >
+                <FaEdit className="me-1" size={14} />
+                <span>Editar</span>
+              </Button>
+              <Button
+                variant="outline-danger"
+                size="sm"
+                onClick={() => handleDeleteConfirm(userItem)}
+                title="Excluir usuário"
+                disabled={userItem.id === user.id}
+                className="flex-fill d-flex align-items-center justify-content-center"
+                style={{ minHeight: "36px" }}
+              >
+                <FaTrash className="me-1" size={14} />
+                <span>Excluir</span>
+              </Button>
+            </div>
+          </Card.Body>
+        </Card>
+      ))}
+    </div>
+  );
+
+  // Renderizar layout desktop (Tabela)
+  const renderDesktopLayout = () => (
+    <div className="d-none d-md-block">
+      <Table responsive striped hover className="mb-0">
+        <thead className="table-dark">
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Função</th>
+            <th>Status</th>
+            <th>Criado em</th>
+            <th width="150">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredUsers.map((userItem) => (
+            <tr key={userItem.id}>
+              <td>
+                <strong>{userItem.name}</strong>
+                {userItem.id === user.id && (
+                  <Badge bg="info" className="ms-2" size="sm">
+                    Você
+                  </Badge>
+                )}
+              </td>
+              <td>{userItem.email}</td>
+              <td>{renderRoleBadge(userItem.role)}</td>
+              <td>{renderStatusBadge(userItem.ativo)}</td>
+              <td>
+                {userItem.created_at
+                  ? new Date(userItem.created_at).toLocaleDateString("pt-BR")
+                  : "-"}
+              </td>
+              <td>
+                <div className="d-flex gap-1">
+                  <Button
+                    variant="outline-primary"
+                    size="sm"
+                    onClick={() => handleEditUser(userItem)}
+                    title="Editar"
+                  >
+                    <FaEdit />
+                  </Button>
+                  <Button
+                    variant="outline-danger"
+                    size="sm"
+                    onClick={() => handleDeleteConfirm(userItem)}
+                    title="Excluir"
+                    disabled={userItem.id === user.id}
+                  >
+                    <FaTrash />
+                  </Button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
+  );
+
   return (
     <Container className="mt-4">
       <BackButton />
@@ -387,63 +528,13 @@ function UserManagement() {
                 </p>
               </div>
             ) : (
-              <Table responsive striped hover className="mb-0">
-                <thead className="table-dark">
-                  <tr>
-                    <th>Nome</th>
-                    <th>Email</th>
-                    <th>Função</th>
-                    <th>Status</th>
-                    <th>Criado em</th>
-                    <th width="150">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.map((userItem) => (
-                    <tr key={userItem.id}>
-                      <td>
-                        <strong>{userItem.name}</strong>
-                        {userItem.id === user.id && (
-                          <Badge bg="info" className="ms-2" size="sm">
-                            Você
-                          </Badge>
-                        )}
-                      </td>
-                      <td>{userItem.email}</td>
-                      <td>{renderRoleBadge(userItem.role)}</td>
-                      <td>{renderStatusBadge(userItem.ativo)}</td>
-                      <td>
-                        {userItem.created_at
-                          ? new Date(userItem.created_at).toLocaleDateString(
-                              "pt-BR"
-                            )
-                          : "-"}
-                      </td>
-                      <td>
-                        <div className="d-flex gap-1">
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                            onClick={() => handleEditUser(userItem)}
-                            title="Editar"
-                          >
-                            <FaEdit />
-                          </Button>
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            onClick={() => handleDeleteConfirm(userItem)}
-                            title="Excluir"
-                            disabled={userItem.id === user.id}
-                          >
-                            <FaTrash />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+              <>
+                {/* Layout Mobile - Cards */}
+                {renderMobileLayout()}
+
+                {/* Layout Desktop - Tabela */}
+                {renderDesktopLayout()}
+              </>
             )}
           </Card.Body>
         </Card>
