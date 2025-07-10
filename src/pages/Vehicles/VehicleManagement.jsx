@@ -226,8 +226,8 @@ function VehicleManagement() {
       {/* Header */}
       <Row className="mb-4">
         <Col>
-          <div className="d-flex justify-content-between align-items-center">
-            <div>
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+            <div className="flex-grow-1">
               <h2 className="mb-1">
                 <FaCar className="me-2" />
                 Gerenciamento de Veículos
@@ -236,10 +236,18 @@ function VehicleManagement() {
                 Gerencie a frota de veículos da empresa
               </p>
             </div>
-            <Button variant="primary" onClick={handleNewVehicle}>
-              <FaPlus className="me-2" />
-              Novo Veículo
-            </Button>
+            <div className="align-self-stretch align-self-md-center">
+              <Button
+                variant="primary"
+                onClick={handleNewVehicle}
+                className="w-100 w-md-auto d-flex align-items-center justify-content-center"
+                style={{ minWidth: "140px" }}
+              >
+                <FaPlus className="me-2" />
+                <span className="d-none d-sm-inline">Novo Veículo</span>
+                <span className="d-inline d-sm-none">Novo</span>
+              </Button>
+            </div>
           </div>
         </Col>
       </Row>
