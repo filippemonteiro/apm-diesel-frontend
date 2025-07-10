@@ -330,27 +330,23 @@ function UserManagement() {
             </div>
 
             {/* Action Buttons */}
-            <div className="d-flex gap-2 pt-3 border-top">
+            <div className="mobile-action-container">
               <Button
                 variant="outline-primary"
-                size="sm"
-                className="flex-fill"
                 onClick={() => handleEditUser(userItem)}
                 title="Editar usuário"
               >
-                <FaEdit className="me-1" />
-                Editar
+                <FaEdit size={14} />
+                <span>Editar</span>
               </Button>
               <Button
                 variant="outline-danger"
-                size="sm"
-                className="flex-fill"
                 onClick={() => handleDeleteConfirm(userItem)}
                 title="Excluir usuário"
                 disabled={userItem.id === user.id}
               >
-                <FaTrash className="me-1" />
-                Excluir
+                <FaTrash size={14} />
+                <span>Excluir</span>
               </Button>
             </div>
           </Card.Body>
