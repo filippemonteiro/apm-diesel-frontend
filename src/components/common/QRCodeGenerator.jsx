@@ -15,6 +15,8 @@ import {
   FaPrint,
   FaCar,
   FaExclamationTriangle,
+  FaWifi,
+  FaSync,
 } from "react-icons/fa";
 import ApiService from "../../services/api";
 import { toast } from "react-toastify";
@@ -23,105 +25,86 @@ function QRCodeGenerator() {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   useEffect(() => {
     loadVehicles();
   }, []);
 
-  const loadVehicles = async () => {
+  const loadVehicles = async (showRetryMessage = false) => {
     setLoading(true);
     setError(null);
 
-    try {
-      const response = await ApiService.getVehicles();
+    if (showRetryMessage) {
+      setIsRetrying(true);
+      toast.info("Carregando veículos...");
+    }
 
-      if (response.vehicles) {
-        setVehicles(response.vehicles);
+    try {
+      console.log("🔍 Carregando veículos do backend...");
+      const response = await ApiService.getVehicles();
+      console.log("📋 Resposta completa da API:", response);
+
+      // Verificar estrutura da resposta - CORRIGIDO
+      let vehicleList = [];
+
+      if (response && response.data && Array.isArray(response.data)) {
+        vehicleList = response.data;
+        console.log("✅ Usando response.data (array)");
+      } else if (response && Array.isArray(response)) {
+        vehicleList = response;
+        console.log("✅ Usando response direto (array)");
+      } else if (
+        response &&
+        response.vehicles &&
+        Array.isArray(response.vehicles)
+      ) {
+        vehicleList = response.vehicles;
+        console.log("✅ Usando response.vehicles (array)");
       } else {
-        // Se não há dados do backend, criar QR codes de exemplo para demonstração
-        const exampleVehicles = [
-          {
-            id: 1,
-            model: "Ford Transit",
-            plate: "ABC-1234",
-            brand: "Ford",
-            year: 2023,
-            qrCode: "APM_VEHICLE_1",
-            status: "available",
-          },
-          {
-            id: 2,
-            model: "Sprinter",
-            plate: "DEF-5678",
-            brand: "Mercedes-Benz",
-            year: 2022,
-            qrCode: "APM_VEHICLE_2",
-            status: "available",
-          },
-          {
-            id: 3,
-            model: "Daily",
-            plate: "GHI-9012",
-            brand: "Iveco",
-            year: 2023,
-            qrCode: "APM_VEHICLE_3",
-            status: "maintenance",
-          },
-        ];
-        setVehicles(exampleVehicles);
-        setError("Backend desconectado - Usando QR codes de demonstração");
+        console.warn("⚠️ Estrutura de resposta não reconhecida:", response);
+        throw new Error("Formato de resposta inesperado do servidor");
+      }
+
+      setVehicles(vehicleList);
+      console.log(`✅ ${vehicleList.length} veículos carregados com sucesso`);
+
+      if (showRetryMessage && vehicleList.length > 0) {
+        toast.success(`${vehicleList.length} veículos carregados!`);
       }
     } catch (error) {
-      console.error("Erro ao carregar veículos:", error);
+      console.error("❌ Erro ao carregar veículos:", error);
+      setError(error.message || "Erro ao conectar com o servidor");
 
-      // Fallback: QR codes de exemplo para demonstração
-      const exampleVehicles = [
-        {
-          id: 1,
-          model: "Ford Transit",
-          plate: "ABC-1234",
-          brand: "Ford",
-          year: 2023,
-          qrCode: "APM_VEHICLE_1",
-          status: "available",
-        },
-        {
-          id: 2,
-          model: "Sprinter",
-          plate: "DEF-5678",
-          brand: "Mercedes-Benz",
-          year: 2022,
-          qrCode: "APM_VEHICLE_2",
-          status: "available",
-        },
-        {
-          id: 3,
-          model: "Daily",
-          plate: "GHI-9012",
-          brand: "Iveco",
-          year: 2023,
-          qrCode: "APM_VEHICLE_3",
-          status: "maintenance",
-        },
-      ];
-      setVehicles(exampleVehicles);
-      setError(
-        "Não foi possível carregar veículos do backend. Usando dados de demonstração."
-      );
-      toast.warning("Usando QR codes de demonstração");
+      if (showRetryMessage) {
+        toast.error("Falha ao carregar veículos: " + error.message);
+      }
     } finally {
       setLoading(false);
+      setIsRetrying(false);
     }
+  };
+
+  const handleRetry = () => {
+    loadVehicles(true);
   };
 
   const getStatusBadge = (status) => {
     const statusConfig = {
+      disponivel: { variant: "success", text: "Disponível" },
+      em_uso: { variant: "warning", text: "Em Uso" },
+      manutencao: { variant: "danger", text: "Manutenção" },
+      indisponivel: { variant: "secondary", text: "Indisponível" },
       available: { variant: "success", text: "Disponível" },
       in_use: { variant: "warning", text: "Em Uso" },
       maintenance: { variant: "danger", text: "Manutenção" },
+      unavailable: { variant: "secondary", text: "Indisponível" },
     };
 
-    const config = statusConfig[status] || statusConfig.available;
+    const config = statusConfig[status] || {
+      variant: "secondary",
+      text: status,
+    };
     return <Badge bg={config.variant}>{config.text}</Badge>;
   };
 
@@ -129,12 +112,26 @@ function QRCodeGenerator() {
     window.print();
   };
 
+  const generateQRCode = (vehicle) => {
+    // Gerar QR Code baseado nos dados do veículo
+    const qrData =
+      vehicle.qrCode || vehicle.qr_code || `APM_VEHICLE_${vehicle.id}`;
+    return qrData;
+  };
+
   if (loading) {
     return (
       <Container>
         <div className="text-center mt-5">
-          <Spinner animation="border" variant="primary" />
-          <p className="mt-3">Carregando QR codes...</p>
+          <Spinner animation="border" variant="primary" size="lg" />
+          <h4 className="mt-3 text-primary">
+            {isRetrying ? "Reconectando..." : "Carregando QR Codes..."}
+          </h4>
+          <p className="text-muted">
+            {isRetrying
+              ? "Tentando reestabelecer conexão com o servidor"
+              : "Obtendo dados dos veículos do servidor"}
+          </p>
         </div>
       </Container>
     );
@@ -147,101 +144,166 @@ function QRCodeGenerator() {
           <FaQrcode className="me-2" />
           QR Codes dos Veículos
         </h2>
-        <p className="text-muted">Para testar o sistema, use estes QR Codes</p>
-        <Button
-          variant="outline-primary"
-          size="sm"
-          onClick={handlePrint}
-          className="d-print-none"
-        >
-          <FaPrint className="me-2" />
-          Imprimir QR Codes
-        </Button>
+        <p className="text-muted">
+          Códigos QR para identificação e controle da frota
+        </p>
+
+        <div className="d-flex justify-content-center gap-2 mb-3">
+          <Button
+            variant="primary"
+            onClick={handlePrint}
+            className="d-print-none"
+            disabled={vehicles.length === 0}
+          >
+            <FaPrint className="me-2" />
+            Imprimir QR Codes
+          </Button>
+
+          <Button
+            variant="outline-secondary"
+            onClick={handleRetry}
+            className="d-print-none"
+            disabled={loading}
+          >
+            <FaSync className={`me-2 ${loading ? "fa-spin" : ""}`} />
+            Atualizar
+          </Button>
+        </div>
       </div>
 
-      {/* Alerta de erro/aviso */}
-      {error && (
-        <Alert variant="warning" className="mb-4 d-print-none">
-          <FaExclamationTriangle className="me-2" />
-          {error}
+      {/* Indicador de Status */}
+      {!error && vehicles.length > 0 && (
+        <Alert variant="success" className="mb-4 d-print-none">
+          <FaWifi className="me-2" />
+          <strong>Sistema Online:</strong> {vehicles.length} veículos carregados
+          da base de dados
         </Alert>
       )}
 
-      <Row className="g-4">
-        {vehicles.map((vehicle) => (
-          <Col key={vehicle.id} md={6} lg={4} className="mb-4">
-            <Card className="h-100 shadow-sm">
-              <Card.Header className="bg-primary-apm text-white">
-                <h6 className="mb-0">
-                  <FaCar className="me-2" />
-                  {vehicle.model}
-                </h6>
-              </Card.Header>
-              <Card.Body className="text-center">
-                <div className="mb-3">
-                  <QRCode
-                    value={vehicle.qrCode}
-                    size={180}
-                    level="H"
-                    includeMargin={true}
-                  />
-                </div>
-                <h5 className="mb-2">{vehicle.plate}</h5>
-                <p className="text-muted mb-2">
-                  {vehicle.brand} - {vehicle.year}
-                </p>
-                <div className="mb-2">{getStatusBadge(vehicle.status)}</div>
-                <small className="text-muted d-block">
-                  Código: {vehicle.qrCode}
-                </small>
-                {vehicle.currentUserId && (
-                  <small className="text-warning d-block mt-1">
-                    Em uso por: Usuário #{vehicle.currentUserId}
-                  </small>
-                )}
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+      {/* Alerta de erro */}
+      {error && (
+        <Alert variant="danger" className="mb-4 d-print-none">
+          <FaExclamationTriangle className="me-2" />
+          <strong>Erro:</strong> {error}
+          <div className="mt-2">
+            <Button variant="outline-danger" size="sm" onClick={handleRetry}>
+              <FaSync className="me-1" />
+              Tentar Novamente
+            </Button>
+          </div>
+        </Alert>
+      )}
 
-      {/* Instruções */}
-      <Card className="mt-4 d-print-none">
-        <Card.Body>
-          <h5>Como usar:</h5>
-          <ol>
-            <li>Imprima ou abra esta página em outro dispositivo</li>
-            <li>Acesse a página de Check-in ou Check-out</li>
-            <li>Clique em "Escanear QR Code"</li>
-            <li>Aponte a câmera para um dos QR Codes acima</li>
-            <li>Complete o formulário e confirme a ação</li>
-          </ol>
-          <hr />
-          <p className="mb-0">
-            <strong>Dica:</strong> Você pode testar escaneando a tela do
-            computador com seu celular ou usar dois dispositivos.
-          </p>
-        </Card.Body>
-      </Card>
+      {/* Lista de Veículos */}
+      <div className="print-area">
+        {vehicles.length === 0 && !loading && !error && (
+          <div className="text-center py-5">
+            <FaCar size={64} className="text-muted mb-3" />
+            <h4 className="text-muted">Nenhum veículo cadastrado</h4>
+            <p className="text-muted">
+              Cadastre veículos no sistema para gerar os QR Codes
+            </p>
+          </div>
+        )}
 
-      {/* Estilos para impressão */}
-      <style jsx>{`
-        @media print {
-          .card {
-            page-break-inside: avoid;
-            border: 1px solid #000 !important;
-          }
-          .card-header {
-            background-color: #f8f9fa !important;
-            color: #000 !important;
-            border-bottom: 1px solid #000 !important;
-          }
-          .badge {
-            border: 1px solid #000 !important;
-            color: #000 !important;
-          }
-        }
-      `}</style>
+        {vehicles.length === 0 && !loading && error && (
+          <div className="text-center py-5">
+            <FaExclamationTriangle size={64} className="text-danger mb-3" />
+            <h4 className="text-danger">Falha ao Carregar Dados</h4>
+            <p className="text-muted">Erro: {error}</p>
+            <Button variant="primary" onClick={handleRetry}>
+              <FaSync className="me-2" />
+              Tentar Reconectar
+            </Button>
+          </div>
+        )}
+
+        <Row className="g-4">
+          {vehicles.map((vehicle) => (
+            <Col key={vehicle.id} md={6} lg={4} className="mb-4">
+              <Card className="h-100 shadow-sm">
+                <Card.Header className="bg-primary-apm text-white">
+                  <h6 className="mb-0">
+                    <FaCar className="me-2" />
+                    {vehicle.modelo || vehicle.model}
+                  </h6>
+                </Card.Header>
+                <Card.Body className="text-center">
+                  <div className="mb-3">
+                    <QRCode
+                      value={generateQRCode(vehicle)}
+                      size={180}
+                      level="H"
+                      includeMargin={true}
+                      style={{
+                        border: "2px solid #f8f9fa",
+                        borderRadius: "8px",
+                        padding: "8px",
+                        background: "white",
+                      }}
+                    />
+                  </div>
+
+                  <h5 className="mb-2 fw-bold text-primary">
+                    {vehicle.placa || vehicle.plate}
+                  </h5>
+
+                  <p className="text-muted mb-2">
+                    <strong>{vehicle.marca || vehicle.brand}</strong>
+                    {vehicle.ano && ` - ${vehicle.ano}`}
+                  </p>
+
+                  {vehicle.cor && (
+                    <p className="text-muted small mb-2">Cor: {vehicle.cor}</p>
+                  )}
+
+                  <div className="mb-3">{getStatusBadge(vehicle.status)}</div>
+
+                  <div className="border-top pt-2">
+                    <small className="text-muted d-block">
+                      <strong>Código:</strong> {generateQRCode(vehicle)}
+                    </small>
+                    <small className="text-muted d-block">
+                      <strong>ID:</strong> {vehicle.id}
+                    </small>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </div>
+
+      {/* Instruções de Uso */}
+      {vehicles.length > 0 && (
+        <Card className="mt-4 d-print-none">
+          <Card.Header>
+            <h5 className="mb-0">📖 Instruções de Uso</h5>
+          </Card.Header>
+          <Card.Body>
+            <Row>
+              <Col md={6}>
+                <h6>🖨️ Para Imprimir:</h6>
+                <ol className="small">
+                  <li>Clique em "Imprimir QR Codes"</li>
+                  <li>Configure a impressora para papel A4</li>
+                  <li>Recomenda-se imprimir em etiquetas adesivas</li>
+                  <li>Cole no para-brisa ou painel do veículo</li>
+                </ol>
+              </Col>
+              <Col md={6}>
+                <h6>📱 Para Usar no Sistema:</h6>
+                <ol className="small">
+                  <li>Acesse "Check-in" ou "Check-out" no menu</li>
+                  <li>Clique em "Escanear QR Code"</li>
+                  <li>Aponte a câmera para o código</li>
+                  <li>Complete as informações solicitadas</li>
+                </ol>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
+      )}
     </Container>
   );
 }
