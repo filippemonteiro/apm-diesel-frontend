@@ -12,6 +12,7 @@ import {
   Modal,
   Form,
   InputGroup,
+  ButtonGroup,
 } from "react-bootstrap";
 import {
   FaCar,
@@ -22,6 +23,8 @@ import {
   FaSearch,
   FaFilter,
   FaQrcode,
+  FaGasPump,
+  FaCalendarAlt,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -219,6 +222,137 @@ function VehicleManagement() {
     return <Badge bg={config.variant}>{config.text}</Badge>;
   };
 
+  // Renderizar layout mobile (Cards) - VERSÃO APRIMORADA
+  const renderMobileLayout = () => (
+    <div className="d-block d-md-none">
+      {filteredVehicles.map((vehicle) => (
+        <Card key={vehicle.id} className="mb-3 shadow-sm border-0">
+          <Card.Body className="p-4">
+            {/* Header - Placa e Status */}
+            <div className="d-flex justify-content-between align-items-start mb-3">
+              <div className="flex-grow-1 me-3">
+                <h6
+                  className="mb-2 fw-bold text-primary-apm"
+                  style={{ fontSize: "1.1rem" }}
+                >
+                  {vehicle.placa}
+                </h6>
+                <div className="text-dark mb-1">
+                  <strong>
+                    {vehicle.marca} {vehicle.modelo}
+                  </strong>
+                </div>
+                {vehicle.cor && vehicle.ano && (
+                  <small
+                    className="text-muted d-block"
+                    style={{ fontSize: "0.85rem" }}
+                  >
+                    {vehicle.cor} • {vehicle.ano}
+                  </small>
+                )}
+              </div>
+              <div className="text-end">
+                {renderStatusBadge(vehicle.status)}
+              </div>
+            </div>
+
+            {/* Info Row - Combustível e Ano */}
+            <div className="d-flex align-items-center mb-3 text-muted">
+              <FaGasPump className="me-2" size={16} />
+              <span className="me-3" style={{ fontSize: "0.9rem" }}>
+                {vehicle.combustivel || "N/A"}
+              </span>
+              {vehicle.ano && (
+                <>
+                  <FaCalendarAlt className="me-2" size={16} />
+                  <span style={{ fontSize: "0.9rem" }}>{vehicle.ano}</span>
+                </>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="mobile-action-container">
+              <Button
+                variant="outline-primary"
+                onClick={() => handleEditVehicle(vehicle)}
+                title="Editar veículo"
+              >
+                <FaEdit size={14} />
+                <span>Editar</span>
+              </Button>
+              <Button
+                variant="outline-danger"
+                onClick={() => handleDeleteConfirm(vehicle)}
+                title="Excluir veículo"
+              >
+                <FaTrash size={14} />
+                <span>Excluir</span>
+              </Button>
+            </div>
+          </Card.Body>
+        </Card>
+      ))}
+    </div>
+  );
+
+  // Renderizar layout desktop (Tabela)
+  const renderDesktopLayout = () => (
+    <div className="d-none d-md-block">
+      <Table responsive striped hover className="mb-0">
+        <thead className="table-dark">
+          <tr>
+            <th>Placa</th>
+            <th>Marca/Modelo</th>
+            <th>Ano</th>
+            <th>Combustível</th>
+            <th>Status</th>
+            <th width="150">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredVehicles.map((vehicle) => (
+            <tr key={vehicle.id}>
+              <td>
+                <strong>{vehicle.placa}</strong>
+              </td>
+              <td>
+                {vehicle.marca} {vehicle.modelo}
+                {vehicle.cor && (
+                  <small className="text-muted d-block">
+                    Cor: {vehicle.cor}
+                  </small>
+                )}
+              </td>
+              <td>{vehicle.ano}</td>
+              <td>{vehicle.combustivel}</td>
+              <td>{renderStatusBadge(vehicle.status)}</td>
+              <td>
+                <div className="d-flex gap-1">
+                  <Button
+                    variant="outline-primary"
+                    size="sm"
+                    onClick={() => handleEditVehicle(vehicle)}
+                    title="Editar"
+                  >
+                    <FaEdit />
+                  </Button>
+                  <Button
+                    variant="outline-danger"
+                    size="sm"
+                    onClick={() => handleDeleteConfirm(vehicle)}
+                    title="Excluir"
+                  >
+                    <FaTrash />
+                  </Button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
+  );
+
   return (
     <Container className="mt-4">
       <BackButton />
@@ -312,58 +446,13 @@ function VehicleManagement() {
                 </p>
               </div>
             ) : (
-              <Table responsive striped hover className="mb-0">
-                <thead className="table-dark">
-                  <tr>
-                    <th>Placa</th>
-                    <th>Marca/Modelo</th>
-                    <th>Ano</th>
-                    <th>Combustível</th>
-                    <th>Status</th>
-                    <th width="150">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredVehicles.map((vehicle) => (
-                    <tr key={vehicle.id}>
-                      <td>
-                        <strong>{vehicle.placa}</strong>
-                      </td>
-                      <td>
-                        {vehicle.marca} {vehicle.modelo}
-                        {vehicle.cor && (
-                          <small className="text-muted d-block">
-                            Cor: {vehicle.cor}
-                          </small>
-                        )}
-                      </td>
-                      <td>{vehicle.ano}</td>
-                      <td>{vehicle.combustivel}</td>
-                      <td>{renderStatusBadge(vehicle.status)}</td>
-                      <td>
-                        <div className="d-flex gap-1">
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                            onClick={() => handleEditVehicle(vehicle)}
-                            title="Editar"
-                          >
-                            <FaEdit />
-                          </Button>
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            onClick={() => handleDeleteConfirm(vehicle)}
-                            title="Excluir"
-                          >
-                            <FaTrash />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+              <>
+                {/* Layout Mobile - Cards */}
+                {renderMobileLayout()}
+
+                {/* Layout Desktop - Tabela */}
+                {renderDesktopLayout()}
+              </>
             )}
           </Card.Body>
         </Card>
