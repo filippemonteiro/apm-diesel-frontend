@@ -103,353 +103,360 @@ function Dashboard() {
   }
 
   return (
-    <Container className="mt-4">
-      {/* Cabeçalho Compacto */}
-      <Row className="mb-3">
-        <Col>
-          <div className="text-center text-md-start">
-            <h2 className="text-primary-apm fw-bold mb-1">Painel</h2>
-            <p className="text-muted mb-0 small">
-              Olá, {user?.name || "Usuário"}! Este é o resumo atual do sistema:
-            </p>
-          </div>
-        </Col>
-      </Row>
+    // FIX 1: Container com altura mínima para evitar scroll desnecessário
+    <div style={{ minHeight: "calc(100vh - 160px)" }}>
+      <Container className="mt-4 pb-4">
+        {/* Cabeçalho Compacto */}
+        <Row className="mb-3">
+          <Col>
+            <div className="text-center text-md-start">
+              <h2 className="text-primary-apm fw-bold mb-1">Painel</h2>
+              <p className="text-muted mb-0 small">
+                Olá, {user?.name || "Usuário"}! Este é o resumo atual do
+                sistema:
+              </p>
+            </div>
+          </Col>
+        </Row>
 
-      {/* Alerta de erro - Compacto */}
-      {error && (
-        <Alert variant="warning" className="mb-3 py-2">
-          <div className="d-flex align-items-center">
-            <div className="me-2">⚠️</div>
-            <small>{error}</small>
-          </div>
-        </Alert>
-      )}
+        {/* Alerta de erro - Compacto */}
+        {error && (
+          <Alert variant="warning" className="mb-3 py-2">
+            <div className="d-flex align-items-center">
+              <div className="me-2">⚠️</div>
+              <small>{error}</small>
+            </div>
+          </Alert>
+        )}
 
-      {/* Cards de Estatísticas - LAYOUT OTIMIZADO PARA MOBILE */}
-      <Row className="g-3 mb-4">
-        {/* Total e Disponíveis - Primeira linha mobile */}
-        <Col xs={6} md={3}>
-          <Card className="border-0 shadow-sm h-100">
-            <Card.Body className="p-3 text-center">
-              <div
-                className="bg-primary text-white rounded-circle p-2 mb-2 mx-auto"
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <FaCar size={16} />
-              </div>
-              <h4 className="mb-0 fw-bold" style={{ fontSize: "1.25rem" }}>
-                {stats.totalVehicles}
-              </h4>
-              <small className="text-muted">Total Veículos</small>
-            </Card.Body>
-          </Card>
-        </Col>
+        {/* Cards de Estatísticas - LAYOUT OTIMIZADO PARA MOBILE */}
+        <Row className="g-3 mb-4">
+          {/* Total e Disponíveis - Primeira linha mobile */}
+          <Col xs={6} md={3}>
+            <Card className="border-0 shadow-sm h-100">
+              <Card.Body className="p-3 text-center">
+                <div
+                  className="bg-primary text-white rounded-circle p-2 mb-2 mx-auto"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <FaCar size={16} />
+                </div>
+                <h4 className="mb-0 fw-bold" style={{ fontSize: "1.25rem" }}>
+                  {stats.totalVehicles}
+                </h4>
+                <small className="text-muted">Total Veículos</small>
+              </Card.Body>
+            </Card>
+          </Col>
 
-        <Col xs={6} md={3}>
-          <Card className="border-0 shadow-sm h-100">
-            <Card.Body className="p-3 text-center">
-              <div
-                className="bg-success text-white rounded-circle p-2 mb-2 mx-auto"
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <FaCar size={16} />
-              </div>
-              <h4 className="mb-0 fw-bold" style={{ fontSize: "1.25rem" }}>
-                {stats.availableVehicles}
-              </h4>
-              <small className="text-muted">Disponíveis</small>
-            </Card.Body>
-          </Card>
-        </Col>
+          <Col xs={6} md={3}>
+            <Card className="border-0 shadow-sm h-100">
+              <Card.Body className="p-3 text-center">
+                <div
+                  className="bg-success text-white rounded-circle p-2 mb-2 mx-auto"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <FaCar size={16} />
+                </div>
+                <h4 className="mb-0 fw-bold" style={{ fontSize: "1.25rem" }}>
+                  {stats.availableVehicles}
+                </h4>
+                <small className="text-muted">Disponíveis</small>
+              </Card.Body>
+            </Card>
+          </Col>
 
-        {/* Em Uso e Manutenção - Segunda linha mobile */}
-        <Col xs={6} md={3}>
-          <Card className="border-0 shadow-sm h-100">
-            <Card.Body className="p-3 text-center">
-              <div
-                className="bg-warning text-white rounded-circle p-2 mb-2 mx-auto"
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <FaCar size={16} />
-              </div>
-              <h4 className="mb-0 fw-bold" style={{ fontSize: "1.25rem" }}>
-                {stats.inUseVehicles}
-              </h4>
-              <small className="text-muted">Em Uso</small>
-            </Card.Body>
-          </Card>
-        </Col>
+          {/* Em Uso e Manutenção - Segunda linha mobile */}
+          <Col xs={6} md={3}>
+            <Card className="border-0 shadow-sm h-100">
+              <Card.Body className="p-3 text-center">
+                <div
+                  className="bg-warning text-white rounded-circle p-2 mb-2 mx-auto"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <FaCar size={16} />
+                </div>
+                <h4 className="mb-0 fw-bold" style={{ fontSize: "1.25rem" }}>
+                  {stats.inUseVehicles}
+                </h4>
+                <small className="text-muted">Em Uso</small>
+              </Card.Body>
+            </Card>
+          </Col>
 
-        <Col xs={6} md={3}>
-          <Card className="border-0 shadow-sm h-100">
-            <Card.Body className="p-3 text-center">
-              <div
-                className="bg-danger text-white rounded-circle p-2 mb-2 mx-auto"
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <FaTools size={16} />
-              </div>
-              <h4 className="mb-0 fw-bold" style={{ fontSize: "1.25rem" }}>
-                {stats.maintenanceVehicles}
-              </h4>
-              <small className="text-muted">Manutenção</small>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+          <Col xs={6} md={3}>
+            <Card className="border-0 shadow-sm h-100">
+              <Card.Body className="p-3 text-center">
+                <div
+                  className="bg-danger text-white rounded-circle p-2 mb-2 mx-auto"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <FaTools size={16} />
+                </div>
+                <h4 className="mb-0 fw-bold" style={{ fontSize: "1.25rem" }}>
+                  {stats.maintenanceVehicles}
+                </h4>
+                <small className="text-muted">Manutenção</small>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
 
-      {/* Estatísticas Secundárias - Compactas */}
-      <Row className="g-3 mb-4">
-        <Col xs={6} md={6}>
-          <Card className="border-0 shadow-sm h-100">
-            <Card.Body className="p-3 d-flex align-items-center">
-              <div
-                className="bg-info text-white rounded-circle p-2 me-3"
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <FaUsers size={16} />
-              </div>
-              <div>
-                <h5 className="mb-0 fw-bold">{stats.totalUsers}</h5>
-                <small className="text-muted">Usuários</small>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        <Col xs={6} md={6}>
-          <Card className="border-0 shadow-sm h-100">
-            <Card.Body className="p-3 d-flex align-items-center">
-              <div
-                className="bg-secondary text-white rounded-circle p-2 me-3"
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <FaChartLine size={16} />
-              </div>
-              <div>
-                <h5 className="mb-0 fw-bold">{stats.pendingRequests}</h5>
-                <small className="text-muted">Chamados</small>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Seção Administrativa - APENAS FUNCIONALIDADES ÚNICAS */}
-      {isAdminOrManager() && (
-        <>
-          <Row className="mb-3">
-            <Col>
-              <div className="d-flex align-items-center justify-content-between">
+        {/* Estatísticas Secundárias - Compactas */}
+        <Row className="g-3 mb-4">
+          <Col xs={6} md={6}>
+            <Card className="border-0 shadow-sm h-100">
+              <Card.Body className="p-3 d-flex align-items-center">
+                <div
+                  className="bg-info text-white rounded-circle p-2 me-3"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <FaUsers size={16} />
+                </div>
                 <div>
-                  <h5 className="text-primary-apm fw-bold mb-1">
-                    <FaCogs className="me-2" />
-                    Administração
-                  </h5>
-                  <p className="text-muted mb-0 small">
-                    Funcionalidades exclusivas para gestores
-                  </p>
+                  <h5 className="mb-0 fw-bold">{stats.totalUsers}</h5>
+                  <small className="text-muted">Usuários</small>
                 </div>
-                <Badge bg="warning" className="d-none d-md-inline">
-                  Admin
-                </Badge>
-              </div>
-            </Col>
-          </Row>
+              </Card.Body>
+            </Card>
+          </Col>
 
-          <Row className="g-3 mb-4">
-            {/* Gerenciar Veículos */}
-            <Col xs={12} sm={6} lg={4}>
-              <Card
-                className="shadow-sm cursor-pointer h-100"
-                onClick={() => handleNavigation("/vehicles")}
-                style={{
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 12px rgba(0,0,0,0.15)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "";
-                }}
-              >
-                <Card.Body className="text-center p-4">
-                  <div
-                    className="bg-primary text-white rounded-circle p-3 mb-3 mx-auto"
-                    style={{
-                      width: "60px",
-                      height: "60px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <FaCar size={24} />
-                  </div>
-                  <Card.Title className="h6 mb-2">
-                    Gerenciar Veículos
-                  </Card.Title>
-                  <Card.Text className="text-muted small mb-3">
-                    Adicione, remova e atualize os dados dos veículos.
-                  </Card.Text>
-                  <Badge bg="primary">Acessar</Badge>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* Gerenciar Usuários */}
-            <Col xs={12} sm={6} lg={4}>
-              <Card
-                className="shadow-sm cursor-pointer h-100"
-                onClick={() => handleNavigation("/users")}
-                style={{
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 12px rgba(0,0,0,0.15)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "";
-                }}
-              >
-                <Card.Body className="text-center p-4">
-                  <div
-                    className="bg-info text-white rounded-circle p-3 mb-3 mx-auto"
-                    style={{
-                      width: "60px",
-                      height: "60px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <FaUsers size={24} />
-                  </div>
-                  <Card.Title className="h6 mb-2">
-                    Gerenciar Usuários
-                  </Card.Title>
-                  <Card.Text className="text-muted small mb-3">
-                    Adicione, remova e edite os perfis de usuário.
-                  </Card.Text>
-                  <Badge bg="primary">Acessar</Badge>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* QR Codes - Mantido pois é específico para admin */}
-            <Col xs={12} sm={6} lg={4}>
-              <Card
-                className="shadow-sm cursor-pointer h-100"
-                onClick={() => handleNavigation("/qr-codes")}
-                style={{
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 12px rgba(0,0,0,0.15)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "";
-                }}
-              >
-                <Card.Body className="text-center p-4">
-                  <div
-                    className="bg-dark text-white rounded-circle p-3 mb-3 mx-auto"
-                    style={{
-                      width: "60px",
-                      height: "60px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <FaQrcode size={24} />
-                  </div>
-                  <Card.Title className="h6 mb-2">QR Codes</Card.Title>
-                  <Card.Text className="text-muted small mb-3">
-                    Códigos QR dos veículos
-                  </Card.Text>
-                  <Badge bg="dark">Acessar</Badge>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-        </>
-      )}
-
-      {/* Status do Sistema - Compacto */}
-      <Row>
-        <Col>
-          <Card className="border-0 shadow-sm">
-            <Card.Body className="py-2 px-3">
-              <div className="d-flex justify-content-between align-items-center">
+          <Col xs={6} md={6}>
+            <Card className="border-0 shadow-sm h-100">
+              <Card.Body className="p-3 d-flex align-items-center">
+                <div
+                  className="bg-secondary text-white rounded-circle p-2 me-3"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <FaChartLine size={16} />
+                </div>
                 <div>
-                  <small className="text-primary-apm fw-semibold">
-                    Status do Sistema
-                  </small>
-                  <div className="text-muted" style={{ fontSize: "0.8rem" }}>
-                    {error ? "🔴 Limitado" : "🟢 Operacional"}
+                  <h5 className="mb-0 fw-bold">{stats.pendingRequests}</h5>
+                  <small className="text-muted">Chamados</small>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Seção Administrativa - APENAS FUNCIONALIDADES ÚNICAS */}
+        {isAdminOrManager() && (
+          <>
+            <Row className="mb-3">
+              <Col>
+                <div className="d-flex align-items-center justify-content-between">
+                  <div>
+                    <h5 className="text-primary-apm fw-bold mb-1">
+                      <FaCogs className="me-2" />
+                      Administração
+                    </h5>
+                    <p className="text-muted mb-0 small">
+                      Funcionalidades exclusivas para gestores
+                    </p>
+                  </div>
+                  <Badge bg="warning" className="d-none d-md-inline">
+                    Admin
+                  </Badge>
+                </div>
+              </Col>
+            </Row>
+
+            <Row className="g-3 mb-4">
+              {/* Gerenciar Veículos */}
+              <Col xs={12} sm={6} lg={4}>
+                <Card
+                  className="shadow-sm cursor-pointer h-100"
+                  onClick={() => handleNavigation("/vehicles")}
+                  style={{
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 12px rgba(0,0,0,0.15)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "";
+                  }}
+                >
+                  <Card.Body className="text-center p-4">
+                    <div
+                      className="bg-primary text-white rounded-circle p-3 mb-3 mx-auto"
+                      style={{
+                        width: "60px",
+                        height: "60px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <FaCar size={24} />
+                    </div>
+                    <Card.Title className="h6 mb-2">
+                      Gerenciar Veículos
+                    </Card.Title>
+                    <Card.Text className="text-muted small mb-3">
+                      Adicione, remova e atualize os dados dos veículos.
+                    </Card.Text>
+                    <Badge bg="primary">Acessar</Badge>
+                  </Card.Body>
+                </Card>
+              </Col>
+
+              {/* Gerenciar Usuários */}
+              <Col xs={12} sm={6} lg={4}>
+                <Card
+                  className="shadow-sm cursor-pointer h-100"
+                  onClick={() => handleNavigation("/users")}
+                  style={{
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 12px rgba(0,0,0,0.15)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "";
+                  }}
+                >
+                  <Card.Body className="text-center p-4">
+                    <div
+                      className="bg-info text-white rounded-circle p-3 mb-3 mx-auto"
+                      style={{
+                        width: "60px",
+                        height: "60px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <FaUsers size={24} />
+                    </div>
+                    <Card.Title className="h6 mb-2">
+                      Gerenciar Usuários
+                    </Card.Title>
+                    <Card.Text className="text-muted small mb-3">
+                      Adicione, remova e edite os perfis de usuário.
+                    </Card.Text>
+                    <Badge bg="primary">Acessar</Badge>
+                  </Card.Body>
+                </Card>
+              </Col>
+
+              {/* QR Codes - Mantido pois é específico para admin */}
+              <Col xs={12} sm={6} lg={4}>
+                <Card
+                  className="shadow-sm cursor-pointer h-100"
+                  onClick={() => handleNavigation("/qr-codes")}
+                  style={{
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 12px rgba(0,0,0,0.15)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "";
+                  }}
+                >
+                  <Card.Body className="text-center p-4">
+                    <div
+                      className="bg-dark text-white rounded-circle p-3 mb-3 mx-auto"
+                      style={{
+                        width: "60px",
+                        height: "60px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <FaQrcode size={24} />
+                    </div>
+                    <Card.Title className="h6 mb-2">QR Codes</Card.Title>
+                    <Card.Text className="text-muted small mb-3">
+                      Códigos QR dos veículos
+                    </Card.Text>
+                    <Badge bg="dark">Acessar</Badge>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+          </>
+        )}
+
+        {/* Status do Sistema - Compacto */}
+        <Row className="mb-3">
+          <Col>
+            <Card className="border-0 shadow-sm">
+              <Card.Body className="py-2 px-3">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <small className="text-primary-apm fw-semibold">
+                      Status do Sistema
+                    </small>
+                    <div className="text-muted" style={{ fontSize: "0.8rem" }}>
+                      {error ? "🔴 Limitado" : "🟢 Operacional"}
+                    </div>
+                  </div>
+                  <div className="text-end d-none d-md-block">
+                    <small
+                      className="text-muted"
+                      style={{ fontSize: "0.75rem" }}
+                    >
+                      {new Date().toLocaleString("pt-BR")}
+                    </small>
                   </div>
                 </div>
-                <div className="text-end d-none d-md-block">
-                  <small className="text-muted" style={{ fontSize: "0.75rem" }}>
-                    {new Date().toLocaleString("pt-BR")}
-                  </small>
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </div>
   );
 }
 
