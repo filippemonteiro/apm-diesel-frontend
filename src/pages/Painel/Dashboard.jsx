@@ -46,14 +46,14 @@ function Dashboard() {
     try {
       // Tentar carregar dados do backend
       const dashboardData = await ApiService.getDashboardData();
-
+      console.log(dashboardData)
       setStats({
-        totalVehicles: dashboardData.total_carros || 0,
-        availableVehicles: dashboardData.carros_disponiveis || 0,
-        inUseVehicles: dashboardData.carros_em_uso || 0,
-        maintenanceVehicles: dashboardData.carros_manutencao || 0,
-        totalUsers: dashboardData.total_usuarios || 0,
-        pendingRequests: dashboardData.chamados_pendentes || 0,
+        totalVehicles: dashboardData.data.total_carros || 0,
+        availableVehicles: dashboardData.data.carros_disponiveis || 0,
+        inUseVehicles: dashboardData.data.carros_em_uso || 0,
+        maintenanceVehicles: dashboardData.data.carros_manutencao || 0,
+        totalUsers: dashboardData.data.total_usuarios || 0,
+        pendingRequests: dashboardData.data.chamados_pendentes || 0,
       });
     } catch (error) {
       console.error("Erro ao carregar dashboard:", error);
