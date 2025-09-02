@@ -6,7 +6,7 @@ import { MESSAGES } from "../utils/constants";
 // 🔥 CONFIGURAÇÃO DE PRODUÇÃO
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "https://api.controllcar.com.br/api",
-  timeout: 15000, // Aumentado para 15s
+  timeout: parseInt(import.meta.env.VITE_API_TIMEOUT) || 15000,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -35,6 +35,19 @@ api.interceptors.request.use(
 // Interceptor de respostas - trata erros globalmente
 api.interceptors.response.use(
   (response) => {
+    // Limpar warnings de deprecação do PHP da resposta
+    if (response.data && typeof response.data === 'string') {
+      try {
+        // Remover warnings de deprecação e extrair apenas o JSON
+        const jsonMatch = response.data.match(/\{.*\}$/);
+        if (jsonMatch) {
+          response.data = JSON.parse(jsonMatch[0]);
+        }
+      } catch (error) {
+        console.warn('⚠️ Erro ao limpar resposta:', error);
+      }
+    }
+    
     console.log(
       `✅ ${response.config.method.toUpperCase()} ${response.config.url} - ${
         response.status
@@ -216,11 +229,35 @@ class ApiService {
 
   async getVehicleByQrCode(qrCode) {
     try {
-      const response = await api.get(`/carros/qr/${qrCode}`);
+      // Primeiro tenta o endpoint específico para QR (se existir)
+      const response = await api.get(`/veiculos/qr/${qrCode}`);
       return response.data;
     } catch (error) {
-      console.error("❌ QR Code não encontrado:", qrCode);
-      throw new Error("QR Code não encontrado.");
+      // Se não existir, busca todos os veículos e filtra pelo QR code
+      try {
+        console.log("🔄 Endpoint /veiculos/qr não encontrado, buscando em todos os veículos...");
+        const vehiclesResponse = await api.get("/veiculos");
+        const vehicles = vehiclesResponse.data.data || vehiclesResponse.data;
+        
+        // Procura o veículo pelo QR code
+        const vehicle = vehicles.find(v => 
+          v.qr_code === qrCode || 
+          v.qrCode === qrCode || 
+          v.placa === qrCode ||
+          v.id.toString() === qrCode
+        );
+        
+        if (vehicle) {
+          console.log("✅ Veículo encontrado:", vehicle.placa || vehicle.id);
+          return { vehicle };
+        } else {
+          console.error("❌ QR Code não encontrado:", qrCode);
+          throw new Error(`Veículo não encontrado para QR Code: ${qrCode}`);
+        }
+      } catch (fallbackError) {
+        console.error("❌ Erro ao buscar veículos:", fallbackError);
+        throw new Error("Erro ao buscar dados do veículo. Verifique sua conexão.");
+      }
     }
   }
 
@@ -348,22 +385,38 @@ class ApiService {
   // ===== CHECK-IN/CHECK-OUT =====
   async checkInVehicle(data) {
     try {
-      const response = await api.post("/checkin", data);
+      const response = await api.post("/frontend/checkin", data);
       console.log("✅ Check-in realizado:", data.qrCode);
       return response.data;
     } catch (error) {
       console.error("❌ Erro no check-in:", error);
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      if (error.response?.data?.errors) {
+        const errors = error.response.data.errors;
+        const errorMessages = Object.values(errors).flat();
+        throw new Error(errorMessages.join(', '));
+      }
       throw new Error("Erro ao realizar check-in.");
     }
   }
 
   async checkOutVehicle(data) {
     try {
-      const response = await api.post("/checkout", data);
+      const response = await api.post("/frontend/checkout", data);
       console.log("✅ Check-out realizado:", data.qrCode);
       return response.data;
     } catch (error) {
       console.error("❌ Erro no check-out:", error);
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      if (error.response?.data?.errors) {
+        const errors = error.response.data.errors;
+        const errorMessages = Object.values(errors).flat();
+        throw new Error(errorMessages.join(', '));
+      }
       throw new Error("Erro ao realizar check-out.");
     }
   }

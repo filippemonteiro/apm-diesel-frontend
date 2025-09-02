@@ -42,37 +42,45 @@ function CheckIn() {
 
   // Sucesso no scan
   const onScanSuccess = async (decodedText) => {
+    console.log("🔍 QR Code escaneado:", decodedText);
     setShowScanner(false);
 
     try {
+      console.log("📡 Buscando veículo no backend...");
       // Buscar dados do veículo
       const response = await ApiService.getVehicleByQrCode(decodedText);
+      console.log("📦 Dados recebidos:", response);
 
       if (response.vehicle) {
+        console.log("🚗 Dados do veículo:", response.vehicle);
         // Verificar se o veículo está disponível
         if (response.vehicle.status === "in_use") {
+          console.log("⚠️ Veículo já está em uso");
           toast.error("Este veículo já está em uso!");
           return;
         }
 
         if (response.vehicle.status === "maintenance") {
+          console.log("🔧 Veículo em manutenção");
           toast.error("Este veículo está em manutenção!");
           return;
         }
 
+        console.log("✅ Veículo válido para check-in");
         setVehicleData(response.vehicle);
         setShowCheckInForm(true);
 
         // Pré-preencher dados atuais
         setFormData((prev) => ({
           ...prev,
-          odometer: response.vehicle.odometer || "",
-          fuelLevel: response.vehicle.fuelLevel || "",
+          odometer: response.vehicle.quilometragem || response.vehicle.odometer || "",
+          fuelLevel: response.vehicle.nivelCombustivel || response.vehicle.fuelLevel || "",
         }));
 
         toast.success("Veículo identificado! Complete o check-in.");
       }
     } catch (error) {
+      console.error("❌ Erro no check-in:", error);
       toast.error(error.message || "Erro ao buscar dados do veículo");
     }
   };
@@ -133,11 +141,11 @@ function CheckIn() {
 
     try {
       const checkInData = {
-        qrCode: vehicleData.qrCode,
-        odometer: parseInt(formData.odometer),
-        fuelLevel: parseInt(formData.fuelLevel),
-        location: formData.location.trim(),
-        notes: formData.notes.trim(),
+        qrCode: vehicleData.qrCode || vehicleData.qr_code,
+        quilometragemAtual: parseInt(formData.odometer),
+        nivelCombustivel: parseInt(formData.fuelLevel),
+        localRetirada: formData.location.trim(),
+        observacoes: formData.notes.trim(),
         timestamp: new Date().toISOString(),
       };
 
@@ -249,18 +257,18 @@ function CheckIn() {
                   <Row>
                     <Col md={6}>
                       <p className="mb-1">
-                        <strong>Veículo:</strong> {vehicleData.model}
+                        <strong>Veículo:</strong> {vehicleData.modelo || vehicleData.model}
                       </p>
                       <p className="mb-1">
-                        <strong>Placa:</strong> {vehicleData.plate}
+                        <strong>Placa:</strong> {vehicleData.placa || vehicleData.plate}
                       </p>
                     </Col>
                     <Col md={6}>
                       <p className="mb-1">
-                        <strong>Marca:</strong> {vehicleData.brand}
+                        <strong>Marca:</strong> {vehicleData.marca || vehicleData.brand}
                       </p>
                       <p className="mb-1">
-                        <strong>Ano:</strong> {vehicleData.year}
+                        <strong>Ano:</strong> {vehicleData.ano || vehicleData.year}
                       </p>
                     </Col>
                   </Row>

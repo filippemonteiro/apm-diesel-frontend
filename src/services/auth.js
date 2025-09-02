@@ -204,12 +204,6 @@ class AuthService {
     const user = LocalStorageService.getCurrentUser();
     const token = LocalStorageService.getAuthToken();
 
-    console.log("🔍 AuthService.isAuthenticated:", {
-      hasUser: !!user,
-      hasToken: !!token,
-      userName: user?.name,
-    });
-
     // Para tokens do Laravel Sanctum, apenas verificamos se existem user e token
     // A API do backend já controla a validade do token automaticamente
     return !!(user && token);
@@ -217,21 +211,13 @@ class AuthService {
 
   // Obter usuário atual
   getCurrentUser() {
-    const user = LocalStorageService.getCurrentUser();
-    console.log("👤 AuthService.getCurrentUser:", user?.name || "null");
-    return user;
+    return LocalStorageService.getCurrentUser();
   }
 
   // Verificar se usuário tem determinada role
   hasRole(role) {
     const user = this.getCurrentUser();
-    const hasRole = user && user.role === role;
-    console.log("🎭 AuthService.hasRole:", {
-      role,
-      hasRole,
-      userRole: user?.role,
-    });
-    return hasRole;
+    return user && user.role === role;
   }
 
   // Verificar se é admin
@@ -255,7 +241,6 @@ class AuthService {
     if (currentUser) {
       const updatedUser = { ...currentUser, ...userData };
       LocalStorageService.setCurrentUser(updatedUser);
-      console.log("📝 Usuario atualizado:", updatedUser.name);
       return updatedUser;
     }
     return null;
@@ -288,11 +273,12 @@ class AuthService {
 
     const user = this.getCurrentUser();
     const vehicle = LocalStorageService.getVehicleById(vehicleId);
+    const currentUserId = vehicle?.currentUserId || vehicle?.current_user_id;
 
     return (
       vehicle &&
-      vehicle.status === "in_use" &&
-      vehicle.currentUserId === user.id
+      (vehicle.status === "in_use" || vehicle.status === "em_uso") &&
+      currentUserId === user.id
     );
   }
 }

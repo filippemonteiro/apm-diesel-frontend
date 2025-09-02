@@ -37,6 +37,26 @@ function Dashboard() {
 
   useEffect(() => {
     loadDashboardData();
+    
+    // Escutar eventos de mudança de status dos veículos
+    const handleVehicleStatusChange = () => {
+      console.log('🔄 Status do veículo alterado, recarregando dashboard...');
+      loadDashboardData();
+    };
+    
+    window.addEventListener('vehicleStatusChanged', handleVehicleStatusChange);
+    
+    // Polling automático a cada 30 segundos
+    const interval = setInterval(() => {
+      console.log('🔄 Atualizando dashboard automaticamente...');
+      loadDashboardData();
+    }, 30000);
+    
+    // Cleanup do event listener e interval
+    return () => {
+      window.removeEventListener('vehicleStatusChanged', handleVehicleStatusChange);
+      clearInterval(interval);
+    };
   }, []);
 
   const loadDashboardData = async () => {
@@ -44,9 +64,9 @@ function Dashboard() {
     setError(null);
 
     try {
-      // Tentar carregar dados do backend
+      // Carregar dados do backend
       const dashboardData = await ApiService.getDashboardData();
-      console.log(dashboardData)
+      
       setStats({
         totalVehicles: dashboardData.data.total_carros || 0,
         availableVehicles: dashboardData.data.carros_disponiveis || 0,

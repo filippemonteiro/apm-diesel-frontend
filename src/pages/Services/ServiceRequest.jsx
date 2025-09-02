@@ -46,39 +46,22 @@ function ServiceRequest() {
   const loadData = async () => {
     setLoadingData(true);
     try {
-      // Usar fetch direto com a URL correta
-      const token = localStorage.getItem("authToken");
-      const response = await fetch(
-        "https://api.controllcar.com.br/api/veiculos",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.ok) {
-        const veiculosData = await response.json();
-        setVeiculos(veiculosData.data || []);
-      } else {
-        console.error(
-          "Erro ao carregar veículos:",
-          response.status,
-          response.statusText
-        );
-      }
+      console.log("🔄 Carregando veículos...");
+      const veiculosData = await ApiService.getVehicles();
+      console.log("📋 Dados recebidos:", veiculosData);
+      setVeiculos(veiculosData.data || veiculosData || []);
     } catch (error) {
-      console.error("Erro ao carregar dados:", error);
+      console.error("❌ Erro ao carregar veículos:", error);
+      setError("Erro ao carregar lista de veículos. Tente novamente.");
     } finally {
       setLoadingData(false);
     }
   };
 
-  const handleServiceClick = (type) => {
+  const openModal = (type) => {
     setServiceType(type);
     setFormData({
-      tipo: type === "combustivel" ? "Abastecimento" : "Manutenção",
+      tipo: type === "combustivel" ? "combustivel" : "manutencao",
       data: new Date().toISOString().split("T")[0], // Data atual
       hora: new Date().toTimeString().split(" ")[0].substring(0, 5), // Hora atual
       observacao: "",
@@ -117,6 +100,12 @@ function ServiceRequest() {
 
       if (response.ok) {
         setSuccess(true);
+        
+        // Disparar evento customizado para atualizar dashboard
+        window.dispatchEvent(new CustomEvent('vehicleStatusChanged', {
+          detail: { vehicleId: formData.veiculo_id, serviceType: formData.tipo }
+        }));
+        
         setTimeout(() => {
           setShowModal(false);
         }, 2000);
@@ -169,7 +158,7 @@ function ServiceRequest() {
                       <p className="text-muted">Solicitar abastecimento</p>
                       <Button
                         variant="primary"
-                        onClick={() => handleServiceClick("combustivel")}
+                        onClick={() => openModal("combustivel")}
                       >
                         Solicitar
                       </Button>
@@ -185,7 +174,7 @@ function ServiceRequest() {
                       <p className="text-muted">Solicitar reparo ou revisão</p>
                       <Button
                         variant="warning"
-                        onClick={() => handleServiceClick("manutencao")}
+                        onClick={() => openModal("manutencao")}
                       >
                         Solicitar
                       </Button>

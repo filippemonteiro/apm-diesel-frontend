@@ -42,37 +42,62 @@ function CheckOut() {
 
   // Sucesso no scan
   const onScanSuccess = async (decodedText) => {
+    console.log("🔍 QR Code escaneado (checkout):", decodedText);
     setShowScanner(false);
 
     try {
+      console.log("📡 Buscando veículo no backend...");
       // Buscar dados do veículo
       const response = await ApiService.getVehicleByQrCode(decodedText);
+      console.log("📦 Dados recebidos:", response);
 
       if (response.vehicle) {
+        console.log("🚗 Dados do veículo:", response.vehicle);
+        console.log("👤 Usuário atual:", user.id);
+        console.log("🔍 Verificando campos de usuário:", {
+          currentUserId: response.vehicle.currentUserId,
+          current_user_id: response.vehicle.current_user_id,
+          userId: response.vehicle.userId,
+          user_id: response.vehicle.user_id,
+          motorista_id: response.vehicle.motorista_id,
+          motoristaId: response.vehicle.motoristaId
+        });
+        
         // Verificar se o veículo está em uso pelo usuário atual
-        if (response.vehicle.status !== "in_use") {
+        if (response.vehicle.status !== "in_use" && response.vehicle.status !== "em_uso") {
+          console.log("⚠️ Veículo não está em uso, status:", response.vehicle.status);
           toast.error("Este veículo não está em uso!");
           return;
         }
 
-        if (response.vehicle.currentUserId !== user.id) {
+        const currentUserId = response.vehicle.currentUserId || 
+                              response.vehicle.current_user_id || 
+                              response.vehicle.userId || 
+                              response.vehicle.user_id || 
+                              response.vehicle.motorista_id || 
+                              response.vehicle.motoristaId;
+        
+        if (!currentUserId || currentUserId !== user.id) {
+          console.log("❌ Veículo em uso por outro usuário. Esperado:", user.id, "Atual:", currentUserId);
           toast.error("Você não pode devolver um veículo que não está usando!");
           return;
         }
 
+        console.log("✅ Veículo válido para check-out");
         setVehicleData(response.vehicle);
         setShowCheckOutForm(true);
 
         // Pré-preencher quilometragem atual
         setFormData((prev) => ({
           ...prev,
-          odometer: response.vehicle.odometer || "",
-          fuelLevel: response.vehicle.fuelLevel || "",
+          odometer: response.vehicle.quilometragem || response.vehicle.odometer || "",
+          fuelLevel: response.vehicle.nivelCombustivel || response.vehicle.fuelLevel || "",
         }));
 
         toast.success("Veículo identificado! Complete o check-out.");
       }
     } catch (error) {
+      console.error("❌ Erro no check-out:", error);
       toast.error(error.message || "Erro ao buscar dados do veículo");
     }
   };
@@ -139,11 +164,11 @@ function CheckOut() {
 
     try {
       const checkOutData = {
-        qrCode: vehicleData.qrCode,
-        odometer: parseInt(formData.odometer),
-        fuelLevel: parseInt(formData.fuelLevel),
-        location: formData.location.trim(),
-        notes: formData.notes.trim(),
+        qrCode: vehicleData.qrCode || vehicleData.qr_code,
+        quilometragemAtual: parseInt(formData.odometer),
+        nivelCombustivel: parseInt(formData.fuelLevel),
+        localDevolucao: formData.location.trim(),
+        observacoes: formData.notes.trim(),
         timestamp: new Date().toISOString(),
       };
 
@@ -255,20 +280,20 @@ function CheckOut() {
                   <Row>
                     <Col md={6}>
                       <p className="mb-1">
-                        <strong>Veículo:</strong> {vehicleData.model}
+                        <strong>Veículo:</strong> {vehicleData.modelo || vehicleData.model}
                       </p>
                       <p className="mb-1">
-                        <strong>Placa:</strong> {vehicleData.plate}
+                        <strong>Placa:</strong> {vehicleData.placa || vehicleData.plate}
                       </p>
                     </Col>
                     <Col md={6}>
                       <p className="mb-1">
                         <strong>Km no Check-in:</strong>{" "}
-                        {vehicleData.odometer?.toLocaleString("pt-BR")} km
+                        {(vehicleData.quilometragem || vehicleData.odometer)?.toLocaleString("pt-BR")} km
                       </p>
                       <p className="mb-1">
                         <strong>Combustível no Check-in:</strong>{" "}
-                        {vehicleData.fuelLevel}%
+                        {vehicleData.nivelCombustivel || vehicleData.fuelLevel}%
                       </p>
                     </Col>
                   </Row>

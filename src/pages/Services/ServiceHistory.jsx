@@ -195,6 +195,16 @@ function ServiceHistory() {
     return <FaWrench className="text-warning me-1" />;
   };
 
+  const formatTipoDisplay = (tipo) => {
+    const tipoMap = {
+      "combustivel": "Abastecimento",
+      "manutencao": "Manutenção",
+      "Abastecimento": "Abastecimento", // Compatibilidade com dados antigos
+      "Manutenção": "Manutenção" // Compatibilidade com dados antigos
+    };
+    return tipoMap[tipo] || tipo;
+  };
+
   const formatDateTime = (data, hora) => {
     try {
       const date = new Date(data);
@@ -357,7 +367,7 @@ function ServiceHistory() {
                           <td>{formatDateTime(servico.data, servico.hora)}</td>
                           <td>
                             {getTipoIcon(servico.tipo)}
-                            {servico.tipo}
+                            {formatTipoDisplay(servico.tipo)}
                           </td>
                           <td>
                             {servico.veiculo

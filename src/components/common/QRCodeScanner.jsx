@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { Modal, Button, Spinner } from "react-bootstrap";
 import { FaQrcode, FaTimes } from "react-icons/fa";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5QrcodeScanner, Html5QrcodeSupportedFormats } from "html5-qrcode";
 import { toast } from "react-toastify";
 
 function QRCodeScanner({ show, onHide, onScanSuccess, title }) {
@@ -22,19 +22,24 @@ function QRCodeScanner({ show, onHide, onScanSuccess, title }) {
       try {
         const scanner = new Html5QrcodeScanner("qr-reader", {
           qrbox: {
-            width: 250,
-            height: 250,
+            width: 300,
+            height: 300,
           },
-          fps: 10,
+          fps: 15,
           rememberLastUsedCamera: true,
           showTorchButtonIfSupported: true,
+          aspectRatio: 1.0,
+          videoConstraints: {
+            facingMode: "environment"
+          },
+          formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE]
         });
 
         scannerRef.current = scanner;
         scanner.render(handleScanSuccess, handleScanError);
       } catch (error) {
         console.error("Erro ao iniciar scanner:", error);
-        toast.error("Erro ao acessar a câmera. Verifique as permissões.");
+        toast.error("Erro ao acessar a câmera. Verifique as permissões e se está usando HTTPS.");
         onHide();
       }
     }, 100);

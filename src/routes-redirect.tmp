@@ -1,2 +1,0 @@
-      {/* Redirecionamento da rota antiga */}
-      <Route path="/dashboard" element={<Navigate to="/painel" replace />} />

@@ -59,6 +59,7 @@ function VehicleManagement() {
     combustivel: "",
     status: "disponivel",
     observacoes: "",
+    qrCode: "",
   });
   const [formLoading, setFormLoading] = useState(false);
 
@@ -85,16 +86,49 @@ function VehicleManagement() {
 
     try {
       const response = await ApiService.getVehicles();
-      console.log("Veículos carregados:", response);
+      console.log("🚗 Veículos carregados:", response);
 
       // Verificar estrutura da resposta
+      let vehicleData = [];
       if (response.data) {
-        setVehicles(response.data);
+        vehicleData = response.data;
       } else if (Array.isArray(response)) {
-        setVehicles(response);
-      } else {
-        setVehicles([]);
+        vehicleData = response;
       }
+      
+      // Análise detalhada dos status dos veículos
+      console.log('📊 Total de veículos na lista:', vehicleData.length);
+      
+      const statusCount = {
+        disponivel: 0,
+        'em uso': 0,
+        manutencao: 0,
+        outros: 0
+      };
+      
+      vehicleData.forEach((vehicle, index) => {
+        console.log(`🚗 Veículo ${index + 1}:`, {
+          placa: vehicle.placa,
+          status: vehicle.status,
+          statusType: typeof vehicle.status
+        });
+        
+        const status = vehicle.status?.toLowerCase();
+        if (status === 'disponivel' || status === 'disponível') {
+          statusCount.disponivel++;
+        } else if (status === 'em uso' || status === 'em_uso') {
+          statusCount['em uso']++;
+        } else if (status === 'manutencao' || status === 'manutenção' || status === 'manutencão') {
+          statusCount.manutencao++;
+        } else {
+          statusCount.outros++;
+          console.log('⚠️ Status não reconhecido:', status);
+        }
+      });
+      
+      console.log('📊 Contagem de status na lista de veículos:', statusCount);
+      
+      setVehicles(vehicleData);
     } catch (error) {
       console.error("Erro ao carregar veículos:", error);
       setError("Erro ao carregar lista de veículos.");
@@ -130,6 +164,7 @@ function VehicleManagement() {
       combustivel: "",
       status: "disponivel",
       observacoes: "",
+      qrCode: "",
     });
     setShowFormModal(true);
   };
@@ -147,6 +182,7 @@ function VehicleManagement() {
       combustivel: vehicle.combustivel || "",
       status: vehicle.status || "disponivel",
       observacoes: vehicle.observacoes || "",
+      qrCode: vehicle.qrCode || vehicle.qr_code || "",
     });
     setShowFormModal(true);
   };
@@ -179,11 +215,17 @@ function VehicleManagement() {
     setFormLoading(true);
 
     try {
+      // Gerar qrCode automaticamente baseado na placa
+      const dataToSend = {
+        ...formData,
+        qrCode: generateQRCodeFromPlaca(formData.placa)
+      };
+
       if (isEditing && selectedVehicle) {
-        await ApiService.updateVehicle(selectedVehicle.id, formData);
+        await ApiService.updateVehicle(selectedVehicle.id, dataToSend);
         toast.success("Veículo atualizado com sucesso!");
       } else {
-        await ApiService.createVehicle(formData);
+        await ApiService.createVehicle(dataToSend);
         toast.success("Veículo cadastrado com sucesso!");
       }
 
@@ -204,6 +246,14 @@ function VehicleManagement() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  // Função para gerar QR Code automaticamente baseado na placa
+  const generateQRCodeFromPlaca = (placa) => {
+    if (!placa || placa.trim() === '') {
+      return '';
+    }
+    return `QR-${placa.toUpperCase().replace(/[^A-Z0-9]/g, '')}`;
   };
 
   // Renderizar badge de status
@@ -579,6 +629,7 @@ function VehicleManagement() {
                   </Form.Select>
                 </Form.Group>
               </Col>
+              {/* QR Code será gerado automaticamente baseado na placa */}
             </Row>
 
             <Form.Group className="mb-3">

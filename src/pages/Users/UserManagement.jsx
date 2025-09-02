@@ -80,15 +80,54 @@ function UserManagement() {
     try {
       const response = await ApiService.getUsers();
       console.log("Usuários carregados:", response);
+      
+      // Log detalhado para debug do campo 'ativo'
+      if (response.data && response.data.length > 0) {
+        console.log("Primeiro usuário (estrutura completa):", JSON.stringify(response.data[0], null, 2));
+        console.log("Todos os campos do primeiro usuário:", Object.keys(response.data[0]));
+        console.log("Campo 'ativo' do primeiro usuário:", response.data[0].ativo);
+        console.log("Tipo do campo 'ativo':", typeof response.data[0].ativo);
+        console.log("Valor em string:", String(response.data[0].ativo));
+      } else if (Array.isArray(response) && response.length > 0) {
+        console.log("Primeiro usuário (estrutura completa):", JSON.stringify(response[0], null, 2));
+        console.log("Todos os campos do primeiro usuário:", Object.keys(response[0]));
+        console.log("Campo 'ativo' do primeiro usuário:", response[0].ativo);
+        console.log("Tipo do campo 'ativo':", typeof response[0].ativo);
+        console.log("Valor em string:", String(response[0].ativo));
+      }
 
       // Verificar estrutura da resposta
+      let userData = [];
       if (response.data) {
-        setUsers(response.data);
+        userData = response.data;
       } else if (Array.isArray(response)) {
-        setUsers(response);
-      } else {
-        setUsers([]);
+        userData = response;
       }
+      
+      // Verificar e corrigir campo 'ativo' se necessário
+      userData = userData.map(user => {
+        // Se o campo 'ativo' não existe ou é null/undefined, definir como "0" (inativo)
+        if (user.ativo === null || user.ativo === undefined) {
+          console.log(`⚠️ Campo 'ativo' não definido para usuário ${user.name}, definindo como "0"`);
+          user.ativo = "0";
+        }
+        
+        // Se o campo 'ativo' é boolean, converter para string
+        if (typeof user.ativo === 'boolean') {
+          console.log(`🔄 Convertendo campo 'ativo' boolean para string para usuário ${user.name}`);
+          user.ativo = user.ativo ? "1" : "0";
+        }
+        
+        // Se o campo 'ativo' é number, converter para string
+        if (typeof user.ativo === 'number') {
+          console.log(`🔄 Convertendo campo 'ativo' number para string para usuário ${user.name}`);
+          user.ativo = String(user.ativo);
+        }
+        
+        return user;
+      });
+      
+      setUsers(userData);
     } catch (error) {
       console.error("Erro ao carregar usuários:", error);
       setError("Erro ao carregar lista de usuários.");
@@ -280,9 +319,16 @@ function UserManagement() {
 
   // Renderizar badge de status
   const renderStatusBadge = (ativo) => {
+    console.log('🔍 Debug renderStatusBadge - valor recebido:', ativo, 'tipo:', typeof ativo);
+    
+    // Converter para string e verificar se é ativo
+    const isActive = String(ativo) === "1" || String(ativo).toLowerCase() === "true" || ativo === true;
+    
+    console.log('🔍 Debug renderStatusBadge - isActive:', isActive);
+    
     return (
-      <Badge bg={ativo === "1" ? "success" : "danger"}>
-        {ativo === "1" ? "Ativo" : "Inativo"}
+      <Badge bg={isActive ? "success" : "danger"}>
+        {isActive ? "Ativo" : "Inativo"}
       </Badge>
     );
   };

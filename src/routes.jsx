@@ -23,6 +23,9 @@ import QRCodeViewer from "./pages/QRCodeViewer/QRCodeViewer";
 import VehicleManagement from "./pages/Vehicles/VehicleManagement";
 import UserManagement from "./pages/Users/UserManagement";
 
+// Componente de teste da API
+import ApiTest from "./components/ApiTest";
+
 // Componente de rota protegida
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -139,6 +142,12 @@ function AppRoutes() {
             </AuthLayout>
           </PublicRoute>
         }
+      />
+
+      {/* Rota de teste da API (temporária) */}
+      <Route
+        path="/api-test"
+        element={<ApiTest />}
       />
 
       {/* Rotas protegidas (requer autenticação) */}
