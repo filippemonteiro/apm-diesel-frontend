@@ -47,31 +47,37 @@ function CheckIn() {
     try {
       // Buscar dados do veículo
       const response = await ApiService.getVehicleByQrCode(decodedText);
-
-      if (response.vehicle) {
+      
+      if (response.reserva) {
         // Verificar se o veículo está disponível
-        if (response.vehicle.status === "in_use") {
+        if (response.reserva) {
           toast.error("Este veículo já está em uso!");
           return;
         }
+      }
 
-        if (response.vehicle.status === "maintenance") {
-          toast.error("Este veículo está em manutenção!");
-          return;
-        }
+        // if (response.vehicle.status === "maintenance") {
+        //   toast.error("Este veículo está em manutenção!");
+        //   return;
+        // }
+        const data = {
+          motorista_id: _user.id,
+          veiculo_id: response.id,
+        };
 
-        setVehicleData(response.vehicle);
-        setShowCheckInForm(true);
+        await ApiService.checkInVehicle(data);
+        // setVehicleData(response.vehicle);
+        // setShowCheckInForm(true);
 
         // Pré-preencher dados atuais
-        setFormData((prev) => ({
-          ...prev,
-          odometer: response.vehicle.odometer || "",
-          fuelLevel: response.vehicle.fuelLevel || "",
-        }));
+        // setFormData((prev) => ({
+        //   ...prev,
+        //   odometer: response.vehicle.odometer || "",
+        //   fuelLevel: response.vehicle.fuelLevel || "",
+        // }));
 
-        toast.success("Veículo identificado! Complete o check-in.");
-      }
+        toast.success("Veículo identificado! Check-in Completo.");
+      
     } catch (error) {
       toast.error(error.message || "Erro ao buscar dados do veículo");
     }
@@ -233,7 +239,7 @@ function CheckIn() {
       />
 
       {/* Formulário de Check-in */}
-      {showCheckInForm && vehicleData && (
+      {showCheckInForm && (
         <div className="row justify-content-center">
           <div className="col-md-8">
             <Card className="shadow">
