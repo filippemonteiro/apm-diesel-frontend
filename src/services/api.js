@@ -214,7 +214,7 @@ class ApiService {
     }
   }
 
-  async getVehicleByQrCode(qrCode) {
+  async getVeiculo(qrCode) {
     try {
       const response = await api.get(`/carros/qr/${qrCode}`);
       return response.data;
@@ -346,9 +346,9 @@ class ApiService {
   }
 
   // ===== CHECK-IN/CHECK-OUT =====
-  async checkInVehicle(data) {
+  async checkIn(data) {
     try {
-      const response = await api.post("/checkin", data);
+      const response = await api.post("reservas/checkin", data);
       console.log("✅ Check-in realizado:", data.qrCode);
       return response.data;
     } catch (error) {
@@ -357,9 +357,9 @@ class ApiService {
     }
   }
 
-  async checkOutVehicle(data) {
+  async checkOut(data) {
     try {
-      const response = await api.post("/checkout", data);
+      const response = await api.put("reservas/checkout", data);
       console.log("✅ Check-out realizado:", data.qrCode);
       return response.data;
     } catch (error) {
@@ -372,6 +372,17 @@ class ApiService {
   async getDashboardData() {
     try {
       const response = await api.get("/dashboard/totais");
+      console.log("📊 Dashboard carregado");
+      return response.data;
+    } catch (error) {
+      console.error("❌ Erro ao carregar dashboard:", error);
+      throw new Error("Erro ao carregar dados do dashboard.");
+    }
+  }
+
+  async getReservas(user_id) {
+    try {
+      const response = await api.get(`/reservas?motorista_id=${user_id}&abertas=true`);
       console.log("📊 Dashboard carregado");
       return response.data;
     } catch (error) {

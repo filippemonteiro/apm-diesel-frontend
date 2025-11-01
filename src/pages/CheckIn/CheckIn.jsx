@@ -25,11 +25,12 @@ import BackButton from "../../components/common/BackButton";
 import { useAuth } from "../../context/AuthContext";
 import ApiService from "../../services/api";
 import QRCodeScanner from "../../components/common/QRCodeScanner";
+import LocalStorageService from "../../services/localStorage"
 
 function CheckIn() {
   const { user: _user } = useAuth();
   const [showScanner, setShowScanner] = useState(false);
-  const [vehicleData, setVehicleData] = useState(null);
+  const [veiculoData, setVeiculoData] = useState(null);
   const [showCheckInForm, setShowCheckInForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -46,28 +47,27 @@ function CheckIn() {
 
     try {
       // Buscar dados do veículo
-      const response = await ApiService.getVehicleByQrCode(decodedText);
+      const response = await ApiService.getVeiculo(decodedText);
 
-      if (response.vehicle) {
+      if (response) {
         // Verificar se o veículo está disponível
-        if (response.vehicle.status === "in_use") {
+        if (response.status === "in_use") {
           toast.error("Este veículo já está em uso!");
           return;
         }
 
-        if (response.vehicle.status === "maintenance") {
+        if (response.status === "maintenance") {
           toast.error("Este veículo está em manutenção!");
           return;
         }
 
-        setVehicleData(response.vehicle);
+        setVeiculoData(response);
         setShowCheckInForm(true);
 
         // Pré-preencher dados atuais
         setFormData((prev) => ({
           ...prev,
-          odometer: response.vehicle.odometer || "",
-          fuelLevel: response.vehicle.fuelLevel || "",
+         ...response
         }));
 
         toast.success("Veículo identificado! Complete o check-in.");
@@ -99,17 +99,17 @@ function CheckIn() {
     const newErrors = {};
 
     // Validar quilometragem
-    if (!formData.odometer) {
-      newErrors.odometer = "Quilometragem é obrigatória";
-    } else if (parseInt(formData.odometer) < 0) {
-      newErrors.odometer = "Quilometragem inválida";
+    if (!formData.km) {
+      newErrors.km = "Quilometragem é obrigatória";
+    } else if (parseInt(formData.km) < 0) {
+      newErrors.km = "Quilometragem inválida";
     }
 
     // Validar nível de combustível
-    if (!formData.fuelLevel) {
-      newErrors.fuelLevel = "Nível de combustível é obrigatório";
-    } else if (formData.fuelLevel < 0 || formData.fuelLevel > 100) {
-      newErrors.fuelLevel = "Nível deve estar entre 0 e 100%";
+    if (!formData.combustivel) {
+      newErrors.combustivel = "Nível de combustível é obrigatório";
+    } else if (formData.combustivel < 0 || formData.combustivel > 100) {
+      newErrors.combustivel = "Nível deve estar entre 0 e 100%";
     }
 
     // Validar localização
@@ -133,27 +133,27 @@ function CheckIn() {
 
     try {
       const checkInData = {
-        qrCode: vehicleData.qrCode,
-        odometer: parseInt(formData.odometer),
-        fuelLevel: parseInt(formData.fuelLevel),
+        motorista_id: LocalStorageService.getCurrentUser().id,
+        veiculo_id: veiculoData.id,
+        km: parseInt(formData.km),
+        combustivel: parseInt(formData.combustivel),
         location: formData.location.trim(),
-        notes: formData.notes.trim(),
-        timestamp: new Date().toISOString(),
+        observacao: formData.notes.trim()
       };
 
-      const response = await ApiService.checkInVehicle(checkInData);
+      const response = await ApiService.checkIn(checkInData);
 
       if (response) {
         toast.success(response.message || "Check-in realizado com sucesso!");
 
         // Resetar formulário
-        setVehicleData(null);
+        setVeiculoData(null);
         setShowCheckInForm(false);
         setFormData({
-          odometer: "",
-          fuelLevel: "",
+          km: "",
+          combustivel: "",
           location: "",
-          notes: "",
+          observacao
         });
       }
     } catch (error) {
@@ -166,12 +166,12 @@ function CheckIn() {
   // Cancelar check-in
   const cancelCheckIn = () => {
     setShowCheckInForm(false);
-    setVehicleData(null);
+    setVeiculoData(null);
     setFormData({
-      odometer: "",
-      fuelLevel: "",
+      km: "",
+      combustivel: "",
       location: "",
-      notes: "",
+      observacao: "",
     });
     setErrors({});
   };
@@ -233,7 +233,7 @@ function CheckIn() {
       />
 
       {/* Formulário de Check-in */}
-      {showCheckInForm && vehicleData && (
+      {showCheckInForm && veiculoData && (
         <div className="row justify-content-center">
           <div className="col-md-8">
             <Card className="shadow">
@@ -249,18 +249,18 @@ function CheckIn() {
                   <Row>
                     <Col md={6}>
                       <p className="mb-1">
-                        <strong>Veículo:</strong> {vehicleData.model}
+                        <strong>Veículo:</strong> {veiculoData.marca} 
                       </p>
                       <p className="mb-1">
-                        <strong>Placa:</strong> {vehicleData.plate}
+                        <strong>Placa:</strong> {veiculoData.placa}
                       </p>
                     </Col>
                     <Col md={6}>
                       <p className="mb-1">
-                        <strong>Marca:</strong> {vehicleData.brand}
+                        <strong>Marca:</strong> {veiculoData.marca}
                       </p>
                       <p className="mb-1">
-                        <strong>Ano:</strong> {vehicleData.year}
+                        <strong>Ano:</strong> {veiculoData.ano}
                       </p>
                     </Col>
                   </Row>
@@ -277,16 +277,16 @@ function CheckIn() {
                         </Form.Label>
                         <Form.Control
                           type="number"
-                          name="odometer"
-                          value={formData.odometer}
+                          name="km"
+                          value={formData.km}
                           onChange={handleChange}
                           placeholder="Ex: 45000"
-                          isInvalid={!!errors.odometer}
+                          isInvalid={!!errors.km}
                           disabled={isSubmitting}
                           min="0"
                         />
                         <Form.Control.Feedback type="invalid">
-                          {errors.odometer}
+                          {errors.km}
                         </Form.Control.Feedback>
                         <Form.Text className="text-muted">
                           Quilometragem atual do veículo
@@ -302,17 +302,17 @@ function CheckIn() {
                         </Form.Label>
                         <Form.Control
                           type="number"
-                          name="fuelLevel"
-                          value={formData.fuelLevel}
+                          name="combustivel"
+                          value={formData.combustivel}
                           onChange={handleChange}
                           placeholder="Ex: 80"
-                          isInvalid={!!errors.fuelLevel}
+                          isInvalid={!!errors.combustivel}
                           disabled={isSubmitting}
                           min="0"
                           max="100"
                         />
                         <Form.Control.Feedback type="invalid">
-                          {errors.fuelLevel}
+                          {errors.combustivel}
                         </Form.Control.Feedback>
                         <Form.Text className="text-muted">
                           Porcentagem de combustível (0-100%)
@@ -348,8 +348,8 @@ function CheckIn() {
                     <Form.Control
                       as="textarea"
                       rows={3}
-                      name="notes"
-                      value={formData.notes}
+                      name="observacao"
+                      value={formData.observacao}
                       onChange={handleChange}
                       placeholder="Informe qualquer problema ou observação sobre o veículo..."
                       disabled={isSubmitting}

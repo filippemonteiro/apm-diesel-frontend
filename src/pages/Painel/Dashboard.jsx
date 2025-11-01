@@ -8,6 +8,7 @@ import {
   Spinner,
   Badge,
 } from "react-bootstrap";
+import { toast } from "react-toastify";
 import {
   FaCar,
   FaUsers,
@@ -31,13 +32,12 @@ function Dashboard() {
     totalUsers: 0,
     pendingRequests: 0,
   });
+  const[listaCheckins, setListaCheckins] = useState([])
 
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
+  
 
   const loadDashboardData = async () => {
     setLoading(true);
@@ -46,7 +46,9 @@ function Dashboard() {
     try {
       // Tentar carregar dados do backend
       const dashboardData = await ApiService.getDashboardData();
-      console.log(dashboardData)
+      const checkins = await ApiService.getReservas(user.id);
+      setListaCheckins(checkins.data)
+    
       setStats({
         totalVehicles: dashboardData.data.total_carros || 0,
         availableVehicles: dashboardData.data.carros_disponiveis || 0,
@@ -86,10 +88,23 @@ function Dashboard() {
     );
   };
 
+  const checkOut = async (id) => {
+    const data = {
+      id: id 
+    }
+    await ApiService.checkOut(data);
+    toast.success("Check-out realizado com sucesso!");
+    loadDashboardData()
+  }
+
   // Função para navegação
   const handleNavigation = (path) => {
     navigate(path);
   };
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
 
   if (loading) {
     return (
@@ -119,6 +134,48 @@ function Dashboard() {
           </Col>
         </Row>
 
+         <Row className="g-3 mb-4">
+        
+          {listaCheckins.map(item => (
+            <Col xs={12} md={12}>
+              <Card className="border-0 shadow-sm h-100">
+                <Card.Body className="p-3 text-center">
+                  <div className="d-flex justify-content-between">
+                 <div className="w-[20%]">
+                   <div
+                    className="bg-primary text-white rounded-circle p-2 mb-2 mx-auto"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <FaCar size={16} />
+                  </div>
+                 </div>
+                  <div className="W-[80%]">
+                    <h4 className="mb-0 fw-bold" style={{ fontSize: "1.25rem" }}>
+                      CheckIn  - Reserva Aberta   <br />
+                    </h4>
+                    <small className="text-muted">
+                      Placa: {item.veiculo.placa || ''} <br />
+                      Modelo: {item.veiculo.modelo || ''} <br />
+                      Marca: {item.veiculo.marca || ''} <br />
+                    </small>
+                    <br />
+                    <span className="badge bg-primary" onClick={() => checkOut(item.id)}>Realizar CheckOut</span>
+                  </div>
+                  </div>
+                  
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+           
+         </Row>
+
         {/* Alerta de erro - Compacto */}
         {error && (
           <Alert variant="warning" className="mb-3 py-2">
@@ -128,6 +185,8 @@ function Dashboard() {
             </div>
           </Alert>
         )}
+
+
 
         {/* Cards de Estatísticas - LAYOUT OTIMIZADO PARA MOBILE */}
         <Row className="g-3 mb-4">
