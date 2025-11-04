@@ -429,6 +429,16 @@ class ApiService {
     }
   }
 
+   async getReservas() {
+    try {
+      const response = await api.get("/reservas");
+      return response.data;
+    } catch (error) {
+      console.error("❌ Erro ao carregar reservas:", error);
+      throw new Error("Erro ao buscar reservas.");
+    }
+  }
+
   // ===== OPÇÕES/CONFIGURAÇÕES =====
   async getVehicleOptions() {
     try {

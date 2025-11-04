@@ -21,10 +21,10 @@ import {
 } from "react-icons/fa";
 import BackButton from "../../components/common/BackButton";
 import { useAuth } from "../../context/AuthContext";
-
+import ApiService from '../../services/api'
 function ServiceHistory() {
   const { user } = useAuth();
-  const [servicos, setServicos] = useState([]);
+  const [reservas, setReservas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filtros, setFiltros] = useState({
@@ -42,53 +42,12 @@ function ServiceHistory() {
       setLoading(true);
       setError("");
       try {
-        const token = localStorage.getItem("authToken");
-
-        // Carregar veículos
+        const data = await ApiService.getReservas();
+        setReservas(data.data)
         try {
-          const veiculosResponse = await fetch(
-            "https://api.controllcar.com.br/api/veiculos",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          if (veiculosResponse.ok) {
-            const veiculosData = await veiculosResponse.json();
-            setVeiculos(veiculosData.data || []);
-          }
+         
         } catch (error) {
           console.error("Erro ao carregar veículos:", error);
-        }
-
-        // Carregar serviços
-        let url = "https://api.controllcar.com.br/api/servicos";
-        const params = new URLSearchParams();
-
-        // Se não for admin, filtrar apenas serviços do motorista logado
-        if (user?.role !== "1" && user?.role !== "2") {
-          params.append("motorista_id", user.id);
-        }
-
-        if (params.toString()) {
-          url += "?" + params.toString();
-        }
-
-        const response = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setServicos(data.data || []);
-        } else {
-          setError("Erro ao carregar histórico de serviços");
         }
       } catch (error) {
         setError("Erro de conexão");
@@ -110,37 +69,8 @@ function ServiceHistory() {
       const token = localStorage.getItem("authToken");
 
       // Construir URL com filtros
-      let url = "https://api.controllcar.com.br/api/servicos";
-      const params = new URLSearchParams();
-
-      // Se não for admin, filtrar apenas serviços do motorista logado
-      if (user?.role !== "1" && user?.role !== "2") {
-        params.append("motorista_id", user.id);
-      }
-
-      if (filtros.data_inicio)
-        params.append("data_inicio", filtros.data_inicio);
-      if (filtros.data_fim) params.append("data_fim", filtros.data_fim);
-      if (filtros.tipo) params.append("tipo", filtros.tipo);
-      if (filtros.veiculo_id) params.append("veiculo_id", filtros.veiculo_id);
-
-      if (params.toString()) {
-        url += "?" + params.toString();
-      }
-
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setServicos(data.data || []);
-      } else {
-        setError("Erro ao carregar histórico de serviços");
-      }
+      const data = await ApiService.getReservas();
+      setReservas(data.data)
     } catch (error) {
       setError("Erro de conexão");
       console.error("Erro ao carregar serviços:", error);
@@ -316,7 +246,7 @@ function ServiceHistory() {
             <Card.Header className="bg-primary-apm text-white">
               <h5 className="mb-0">
                 <FaHistory className="me-2" />
-                Histórico de Serviços ({servicos.length} registros)
+                Histórico de Serviços ({reservas.length} registros)
               </h5>
             </Card.Header>
             <Card.Body>
@@ -331,7 +261,7 @@ function ServiceHistory() {
                   <Spinner animation="border" variant="primary" />
                   <p className="mt-3">Carregando histórico...</p>
                 </div>
-              ) : servicos.length === 0 ? (
+              ) : reservas.length === 0 ? (
                 <Alert variant="info" className="text-center">
                   <FaHistory className="me-2" />
                   Nenhum serviço encontrado para os filtros selecionados.
@@ -348,39 +278,47 @@ function ServiceHistory() {
                         <th>Valor</th>
                         <th>KM</th>
                         <th>Status</th>
+                        
                         <th>Observação</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {servicos.map((servico) => (
-                        <tr key={servico.id}>
-                          <td>{formatDateTime(servico.data, servico.hora)}</td>
+                      {reservas.map((reserva) => (
+                        <tr key={reserva.id}>
+                          <td>{formatDateTime(reserva.data, reserva.hora)}</td>
                           <td>
-                            {getTipoIcon(servico.tipo)}
-                            {servico.tipo}
+                            {getTipoIcon(reserva.tipo)}
+                            {reserva.tipo}
                           </td>
                           <td>
-                            {servico.veiculo
-                              ? `${servico.veiculo.marca} ${servico.veiculo.modelo} - ${servico.veiculo.cor}`
+                            {reserva.veiculo
+                              ? `${reserva.veiculo.marca} ${reserva.veiculo.modelo} - ${reserva.veiculo.cor}`
                               : "Veículo não encontrado"}
+
+                            <br />
+                            <strong>Data e Hora:</strong>
+                            <br />
+                            {reserva.data_hora_checkin} - {reserva.data_hora_checkout}
                           </td>
                           <td>
-                            {servico.motorista
-                              ? servico.motorista.name
+                            {reserva.motorista
+                              ? reserva.motorista.name
                               : "Motorista não encontrado"}
                           </td>
-                          <td>{formatCurrency(servico.valor)}</td>
-                          <td>{servico.km ? `${servico.km} km` : "-"}</td>
-                          <td>{getStatusBadge(servico.status)}</td>
+                          <td>{formatCurrency(reserva.valor)}</td>
+                          <td>{reserva.km ? `${reserva.km} km` : "-"}</td>
+                          <td>{getStatusBadge(reserva.status)}</td>
+                          
+                          <td></td>
                           <td>
-                            {servico.observacao ? (
+                            {reserva.observacao ? (
                               <span
-                                title={servico.observacao}
+                                title={reserva.observacao}
                                 style={{ cursor: "help" }}
                               >
-                                {servico.observacao.length > 30
-                                  ? servico.observacao.substring(0, 30) + "..."
-                                  : servico.observacao}
+                                {reserva.observacao.length > 30
+                                  ? reserva.observacao.substring(0, 30) + "..."
+                                  : reserva.observacao}
                               </span>
                             ) : (
                               "-"
