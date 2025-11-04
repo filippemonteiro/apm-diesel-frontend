@@ -345,6 +345,17 @@ class ApiService {
     }
   }
 
+  async getReservas(data) {
+    try {
+      const response = await api.get("reservas", data);
+      console.log("✅ Check-in realizado:", data.qrCode);
+      return response.data;
+    } catch (error) {
+      console.error("❌ Erro no check-in:", error);
+      throw new Error("Erro ao realizar check-in.");
+    }
+  }
+
   // ===== CHECK-IN/CHECK-OUT =====
   async checkIn(data) {
     try {

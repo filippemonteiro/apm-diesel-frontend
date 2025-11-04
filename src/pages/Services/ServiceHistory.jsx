@@ -21,6 +21,7 @@ import {
 } from "react-icons/fa";
 import BackButton from "../../components/common/BackButton";
 import { useAuth } from "../../context/AuthContext";
+import ApiService from './../../services/api';
 
 function ServiceHistory() {
   const { user } = useAuth();
@@ -65,31 +66,11 @@ function ServiceHistory() {
         }
 
         // Carregar serviços
-        let url = "https://api.controllcar.com.br/api/servicos";
-        const params = new URLSearchParams();
+        const params = {}
+        const data = await ApiService.getReservas(params);
+        // console.log(data)
+        setServicos(data.data || []);
 
-        // Se não for admin, filtrar apenas serviços do motorista logado
-        if (user?.role !== "1" && user?.role !== "2") {
-          params.append("motorista_id", user.id);
-        }
-
-        if (params.toString()) {
-          url += "?" + params.toString();
-        }
-
-        const response = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setServicos(data.data || []);
-        } else {
-          setError("Erro ao carregar histórico de serviços");
-        }
       } catch (error) {
         setError("Erro de conexão");
         console.error("Erro ao carregar dados:", error);
@@ -107,40 +88,9 @@ function ServiceHistory() {
     setLoading(true);
     setError("");
     try {
-      const token = localStorage.getItem("authToken");
-
-      // Construir URL com filtros
-      let url = "https://api.controllcar.com.br/api/servicos";
-      const params = new URLSearchParams();
-
-      // Se não for admin, filtrar apenas serviços do motorista logado
-      if (user?.role !== "1" && user?.role !== "2") {
-        params.append("motorista_id", user.id);
-      }
-
-      if (filtros.data_inicio)
-        params.append("data_inicio", filtros.data_inicio);
-      if (filtros.data_fim) params.append("data_fim", filtros.data_fim);
-      if (filtros.tipo) params.append("tipo", filtros.tipo);
-      if (filtros.veiculo_id) params.append("veiculo_id", filtros.veiculo_id);
-
-      if (params.toString()) {
-        url += "?" + params.toString();
-      }
-
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setServicos(data.data || []);
-      } else {
-        setError("Erro ao carregar histórico de serviços");
-      }
+      const params = {}
+      const data = await ApiService.getReservas(params);
+      setServicos(data.data || []);
     } catch (error) {
       setError("Erro de conexão");
       console.error("Erro ao carregar serviços:", error);
