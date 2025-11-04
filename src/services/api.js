@@ -346,10 +346,9 @@ class ApiService {
   }
 
   // ===== CHECK-IN/CHECK-OUT =====
-  async checkInVehicle(data) {
+  async checkIn(data) {
     try {
-      const response = await api.post("/reservas", data);
-      console.log("✅ Check-in realizado:", data);
+      const response = await api.post("reservas/checkin", data);
       return response.data;
     } catch (error) {
       console.error("❌ Erro no check-in:", error);

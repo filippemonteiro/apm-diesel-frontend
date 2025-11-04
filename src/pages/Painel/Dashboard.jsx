@@ -108,7 +108,7 @@ function Dashboard() {
       <Container className="mt-4 pb-4">
         {/* Cabeçalho Compacto */}
         <Row className="mb-3">
-          <Col>
+          <Col md={'6'}>
             <div className="text-center text-md-start">
               <h2 className="text-primary-apm fw-bold mb-1">Painel</h2>
               <p className="text-muted mb-0 small">
@@ -116,6 +116,9 @@ function Dashboard() {
                 sistema:
               </p>
             </div>
+          </Col>
+          <Col>
+            teste
           </Col>
         </Row>
 

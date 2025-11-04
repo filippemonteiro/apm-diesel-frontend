@@ -29,7 +29,7 @@ import QRCodeScanner from "../../components/common/QRCodeScanner";
 function CheckIn() {
   const { user: _user } = useAuth();
   const [showScanner, setShowScanner] = useState(false);
-  const [vehicleData, setVehicleData] = useState(null);
+  const [veiculoData, setVeiculoData] = useState(null);
   const [showCheckInForm, setShowCheckInForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -65,9 +65,9 @@ function CheckIn() {
           veiculo_id: response.id,
         };
 
-        await ApiService.checkInVehicle(data);
-        // setVehicleData(response.vehicle);
-        // setShowCheckInForm(true);
+        // await ApiService.checkInVehicle(data);
+        setVeiculoData(response);
+        setShowCheckInForm(true);
 
         // Pré-preencher dados atuais
         // setFormData((prev) => ({
@@ -139,7 +139,7 @@ function CheckIn() {
 
     try {
       const checkInData = {
-        qrCode: vehicleData.qrCode,
+        qrCode: veiculo.id,
         odometer: parseInt(formData.odometer),
         fuelLevel: parseInt(formData.fuelLevel),
         location: formData.location.trim(),
@@ -147,13 +147,13 @@ function CheckIn() {
         timestamp: new Date().toISOString(),
       };
 
-      const response = await ApiService.checkInVehicle(checkInData);
+      const response = await ApiService.checkIn(checkInData);
 
       if (response) {
         toast.success(response.message || "Check-in realizado com sucesso!");
 
         // Resetar formulário
-        setVehicleData(null);
+        setVeiculoData(null);
         setShowCheckInForm(false);
         setFormData({
           odometer: "",
@@ -255,18 +255,18 @@ function CheckIn() {
                   <Row>
                     <Col md={6}>
                       <p className="mb-1">
-                        <strong>Veículo:</strong> {vehicleData.model}
+                        <strong>Veículo:</strong> {veiculoData.model}
                       </p>
                       <p className="mb-1">
-                        <strong>Placa:</strong> {vehicleData.plate}
+                        <strong>Placa:</strong> {veiculoData.plate}
                       </p>
                     </Col>
                     <Col md={6}>
                       <p className="mb-1">
-                        <strong>Marca:</strong> {vehicleData.brand}
+                        <strong>Marca:</strong> {veiculoData.brand}
                       </p>
                       <p className="mb-1">
-                        <strong>Ano:</strong> {vehicleData.year}
+                        <strong>Ano:</strong> {veiculoData.year}
                       </p>
                     </Col>
                   </Row>
