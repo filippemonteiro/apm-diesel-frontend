@@ -66,8 +66,10 @@ function ServiceHistory() {
         }
 
         // Carregar serviços
-        const params = {}
-        const data = await ApiService.getReservas(params);
+        const params = {
+          motorista_id: user.id
+        }
+        const data = await ApiService.getReservas(user.id, false);
         // console.log(data)
         setServicos(data.data || []);
 
@@ -81,15 +83,18 @@ function ServiceHistory() {
 
     initializeData();
   }, [user]);
-
+  
   const aplicarFiltros = async () => {
     if (!user) return;
 
     setLoading(true);
     setError("");
     try {
-      const params = {}
-      const data = await ApiService.getReservas(params);
+
+      const params = {
+        motorista_id: user.id
+      }
+      const data = await ApiService.getReservas(user.id, false);
       setServicos(data.data || []);
     } catch (error) {
       setError("Erro de conexão");

@@ -391,9 +391,13 @@ class ApiService {
     }
   }
 
-  async getReservas(user_id) {
+  async getReservas(user_id, abertas = true) {
     try {
-      const response = await api.get(`/reservas?motorista_id=${user_id}&abertas=true`);
+      let url = `/reservas?motorista_id=${user_id}`
+      if(abertas) {
+        url = `/reservas?motorista_id=${user_id}&abertas=${abertas}`
+      }
+      const response = await api.get(url);
       console.log("📊 Dashboard carregado");
       return response.data;
     } catch (error) {

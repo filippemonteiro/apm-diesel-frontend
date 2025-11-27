@@ -37,8 +37,6 @@ function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  
-
   const loadDashboardData = async () => {
     setLoading(true);
     setError(null);
@@ -77,6 +75,20 @@ function Dashboard() {
       setLoading(false);
     }
   };
+
+  const formatarData = (dataISO)  => {
+    
+    const data = new Date(dataISO);
+
+    const dia = String(data.getUTCDate()).padStart(2, '0');
+    const mes = String(data.getUTCMonth() + 1).padStart(2, '0');
+    const ano = data.getUTCFullYear();
+    const hora = String(data.getUTCHours()).padStart(2, '0');
+    const minutos = String(data.getUTCMinutes()).padStart(2, '0');
+
+    const formatado = `${dia}/${mes}/${ano} ${hora}:${minutos}`;
+    return formatado
+  }
 
   // Verificar se é admin ou manager
   const isAdminOrManager = () => {
@@ -163,6 +175,8 @@ function Dashboard() {
                       Placa: {item.veiculo.placa || ''} <br />
                       Modelo: {item.veiculo.modelo || ''} <br />
                       Marca: {item.veiculo.marca || ''} <br />
+                      Data: {formatarData(item.data_hora_checkin) || ''}
+                    
                     </small>
                     <br />
                     <span className="badge bg-primary" onClick={() => checkOut(item.id)}>Realizar CheckOut</span>

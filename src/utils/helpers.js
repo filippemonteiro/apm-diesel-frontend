@@ -26,6 +26,19 @@ export const formatDate = (dateString) => {
   }).format(date);
 };
 
+export const formatarData = (dataISO)  => {
+    
+    const data = new Date(dataISO);
+
+    const dia = String(data.getUTCDate()).padStart(2, '0');
+    const mes = String(data.getUTCMonth() + 1).padStart(2, '0');
+    const ano = data.getUTCFullYear();
+    const hora = String(data.getUTCHours()).padStart(2, '0');
+    const minutos = String(data.getUTCMinutes()).padStart(2, '0');
+
+    const formatado = `${dia}/${mes}/${ano} ${hora}:${minutos}`;
+    return formatado
+  }
 // Formatar número com separador de milhares
 export const formatNumber = (number) => {
   if (!number && number !== 0) return "";
